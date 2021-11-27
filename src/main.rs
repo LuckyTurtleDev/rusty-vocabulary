@@ -1,4 +1,8 @@
-use gtk::{ButtonExt, Inhibit, OrientableExt, Orientation::Vertical, WidgetExt};
+use gtk::{
+	prelude::{ButtonExt, OrientableExt, WidgetExt},
+	Inhibit,
+	Orientation::Vertical,
+};
 use relm::Widget;
 use relm_derive::{widget, Msg};
 use std::io;
@@ -51,6 +55,6 @@ impl Widget for WinMainMenu {
 }
 
 fn main() -> Result<(), io::Error> {
-	Win::run(()).unwrap();
+	WinMainMenu::run(()).unwrap();
 	Ok(())
 }
