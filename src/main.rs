@@ -1,5 +1,5 @@
 use gtk::{
-	prelude::{ButtonExt, OrientableExt, WidgetExt},
+	prelude::{ButtonExt, LabelExt, OrientableExt, WidgetExt},
 	Inhibit,
 	Orientation::Vertical,
 };
@@ -21,26 +21,40 @@ impl Widget for WinMainMenu {
 
 	view! {
 		gtk::Window {
-			gtk::Box {
-				orientation: Vertical,
-				gtk::Button {
-					clicked => MsgMainMenu::Query,
-					label: "query vocabulary",
+			gtk::Box{
+				gtk::Box{
+					orientation: Vertical,
+					gtk::Label {
+						label: "total vocabulary: 0",
+					},
+					gtk::Label {
+						label: "outstanding vocabulary: 0",
+					},
+					gtk::Label {
+						label: "subjects/languages: 0",
+					},
 				},
-				gtk::Button {
-					clicked => MsgMainMenu::Add,
-					label: "add vocabulary",
+				gtk::Box {
+					orientation: Vertical,
+					gtk::Button {
+						clicked => MsgMainMenu::Query,
+						label: "query vocabulary",
+					},
+					gtk::Button {
+						clicked => MsgMainMenu::Add,
+						label: "add vocabulary",
+					},
+					gtk::Button {
+						clicked => MsgMainMenu::Explore,
+						label: "explore vocabulary",
+					},
+					gtk::Button {
+						clicked => MsgMainMenu::Quit,
+						label: "quit",
+					},
 				},
-				gtk::Button {
-					clicked => MsgMainMenu::Explore,
-					label: "explore vocabulary",
-				},
-				gtk::Button {
-					clicked => MsgMainMenu::Quit,
-					label: "quit",
-				},
-			},
-			delete_event(_, _) => (MsgMainMenu::Quit, Inhibit(false)),
+				delete_event(_, _) => (MsgMainMenu::Quit, Inhibit(false)),
+			}
 		}
 	}
 
