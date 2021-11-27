@@ -1,32 +1,56 @@
-use std::{io, process::exit};
-use tui::{
-	backend::CrosstermBackend,
-	style::{Color, Style},
-	widgets::{Block, Borders, List, ListItem},
-	Terminal,
-};
+use gtk::{ButtonExt, Inhibit, OrientableExt, Orientation::Vertical, WidgetExt};
+use relm::Widget;
+use relm_derive::{widget, Msg};
+use std::io;
 
-fn main_menu<B: tui::backend::Backend>(mut terminal: Terminal<B>) -> anyhow::Result<()> {
-	terminal.clear()?;
-	let items = [ListItem::new("query vocabulary"), ListItem::new("add vocabulary")];
-	let list = List::new(items)
-		.block(Block::default().title("Main Menu").borders(Borders::ALL))
-		.style(Style::default().fg(Color::White));
-	terminal.draw(|f| {
-		let size = f.size();
-		f.render_widget(list, size);
-	})?;
-	Ok(())
+#[derive(Msg)]
+pub enum MsgMainMenu {
+	Query,
+	Add,
+	Explore,
+	Quit,
+}
+
+#[widget]
+impl Widget for WinMainMenu {
+	fn model() {}
+
+	view! {
+		gtk::Window {
+			gtk::Box {
+				orientation: Vertical,
+				gtk::Button {
+					clicked => MsgMainMenu::Query,
+					label: "query vocabulary",
+				},
+				gtk::Button {
+					clicked => MsgMainMenu::Add,
+					label: "add vocabulary",
+				},
+				gtk::Button {
+					clicked => MsgMainMenu::Explore,
+					label: "explore vocabulary",
+				},
+				gtk::Button {
+					clicked => MsgMainMenu::Quit,
+					label: "quit",
+				},
+			},
+			delete_event(_, _) => (MsgMainMenu::Quit, Inhibit(false)),
+		}
+	}
+
+	fn update(&mut self, event: MsgMainMenu) {
+		match event {
+			MsgMainMenu::Query => eprintln!("query vocabulary is current unimplemented"),
+			MsgMainMenu::Add => eprintln!("add vocabulary is current unimplemented"),
+			MsgMainMenu::Explore => eprintln!("explore vocabulary is current unimplemented"),
+			MsgMainMenu::Quit => gtk::main_quit(),
+		}
+	}
 }
 
 fn main() -> Result<(), io::Error> {
-	let stdout = io::stdout();
-	let backend = CrosstermBackend::new(stdout);
-	let mut terminal = Terminal::new(backend)?;
-
-	if let Err(error) = main_menu(terminal) {
-		eprintln!("{:?}", error);
-		exit(1);
-	}
+	Win::run(()).unwrap();
 	Ok(())
 }
