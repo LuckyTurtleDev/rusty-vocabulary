@@ -7,6 +7,4 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
-gtk = "0.14.3"
-relm = "0.22.0"
-relm-derive = "0.22.0"
+iced = {version = "0.3", features = ["glow"]}
