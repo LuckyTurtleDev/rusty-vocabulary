@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
-iced = {version = "0.3", features = ["glow"]}
+iced = { version = "0.3", features = ["glow", "glow_default_system_font"], default-features = false }

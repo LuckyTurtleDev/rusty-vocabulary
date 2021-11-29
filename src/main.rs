@@ -1,4 +1,4 @@
-use iced::{button, Button, Column, Element, Row, Sandbox, Settings, Text};
+use iced::{button, widget::Space, Button, Column, Element, Length, Row, Sandbox, Settings, Text};
 use std::process::exit;
 
 #[derive(Debug, Clone, Copy)]
@@ -45,19 +45,26 @@ impl Sandbox for MainMenu {
 
 	fn view(&mut self) -> Element<Self::Message> {
 		Row::new()
+			.push(Space::new(Length::Fill, Length::Shrink))
 			.push(
 				Column::new()
+					.push(Space::new(Length::Shrink, Length::Fill))
 					.push(Text::new(format!("total vocabulary: {}", self.total_vocabulary)))
 					.push(Text::new(format!("outstanding vocabulary: {}", self.outstanding_vocabulary)))
-					.push(Text::new(format!("subjects/languages: {}", self.subjects))),
+					.push(Text::new(format!("subjects/languages: {}", self.subjects)))
+					.push(Space::new(Length::Shrink, Length::Fill)),
 			)
+			.push(Space::new(iced::Length::Units(20), Length::Shrink))
 			.push(
 				Column::new()
+					.push(Space::new(Length::Shrink, Length::Fill))
 					.push(Button::new(&mut self.button_querry, Text::new("querry vocabulary")))
 					.push(Button::new(&mut self.button_add, Text::new("add vocabulary")).on_press(MsgMainMenu::Add))
 					.push(Button::new(&mut self.button_explore, Text::new("explore vocabulary")))
-					.push(Button::new(&mut self.button_quit, Text::new("quit")).on_press(MsgMainMenu::Quit)),
+					.push(Button::new(&mut self.button_quit, Text::new("quit")).on_press(MsgMainMenu::Quit))
+					.push(Space::new(Length::Shrink, Length::Fill)),
 			)
+			.push(Space::new(Length::Fill, Length::Shrink))
 			.into()
 	}
 }
