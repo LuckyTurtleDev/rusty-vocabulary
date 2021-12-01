@@ -5,20 +5,18 @@ use std::process::exit;
 pub enum MsgMainMenu {
 	Add,
 	Quit,
-	Nothing,
 }
 
-enum AktiveMenu {
-	MainMenu,
-	Add,
+#[derive(Debug, Clone, Copy)]
+pub enum Message {
+	MainMenu(MsgMainMenu),
 }
 
-struct AddWindow {
+struct WinAddVocabulary {
 	button_add: button::State,
 }
 
-struct MainMenu {
-	aktive_menu: AktiveMenu,
+struct WinMainMenu {
 	total_vocabulary: u32,
 	outstanding_vocabulary: u32,
 	subjects: u16,
@@ -26,15 +24,18 @@ struct MainMenu {
 	button_add: button::State,
 	button_explore: button::State,
 	button_quit: button::State,
-	add: AddWindow,
 }
 
-impl Sandbox for MainMenu {
-	type Message = MsgMainMenu;
+enum Window {
+	MainMenu(WinMainMenu),
+	AddVocabulary(WinAddVocabulary),
+}
 
-	fn new() -> MainMenu {
-		MainMenu {
-			aktive_menu: AktiveMenu::MainMenu,
+impl Sandbox for Window {
+	type Message = Message;
+
+	fn new() -> Window {
+		Window::MainMenu(WinMainMenu {
 			total_vocabulary: 0,
 			outstanding_vocabulary: 0,
 			subjects: 0,
@@ -42,10 +43,7 @@ impl Sandbox for MainMenu {
 			button_add: button::State::new(),
 			button_explore: button::State::new(),
 			button_quit: button::State::new(),
-			add: AddWindow {
-				button_add: button::State::new(),
-			},
-		}
+		})
 	}
 
 	fn title(&self) -> String {
@@ -54,42 +52,53 @@ impl Sandbox for MainMenu {
 
 	fn update(&mut self, message: Self::Message) {
 		match message {
-			MsgMainMenu::Quit => exit(0),
-			MsgMainMenu::Add => self.aktive_menu = AktiveMenu::Add,
-			MsgMainMenu::Nothing => (),
+			Message::MainMenu(msg) => match msg {
+				MsgMainMenu::Quit => exit(0),
+				MsgMainMenu::Add => {
+					*self = Window::AddVocabulary(WinAddVocabulary {
+						button_add: button::State::new(),
+					})
+				},
+			},
 		};
 	}
 
 	fn view(&mut self) -> Element<Self::Message> {
-		match self.aktive_menu {
-			AktiveMenu::MainMenu => Row::new()
+		match self {
+			Window::MainMenu(state) => Row::new()
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.push(
 					Column::new()
 						.push(Space::new(Length::Shrink, Length::Fill))
-						.push(Text::new(format!("total vocabulary: {}", self.total_vocabulary)))
-						.push(Text::new(format!("outstanding vocabulary: {}", self.outstanding_vocabulary)))
-						.push(Text::new(format!("subjects/languages: {}", self.subjects)))
+						.push(Text::new(format!("total vocabulary: {}", state.total_vocabulary)))
+						.push(Text::new(format!("outstanding vocabulary: {}", state.outstanding_vocabulary)))
+						.push(Text::new(format!("subjects/languages: {}", state.subjects)))
 						.push(Space::new(Length::Shrink, Length::Fill)),
 				)
 				.push(Space::new(iced::Length::Units(20), Length::Shrink))
 				.push(
 					Column::new()
 						.push(Space::new(Length::Shrink, Length::Fill))
-						.push(Button::new(&mut self.button_querry, Text::new("querry vocabulary")))
-						.push(Button::new(&mut self.button_add, Text::new("add vocabulary")).on_press(MsgMainMenu::Add))
-						.push(Button::new(&mut self.button_explore, Text::new("explore vocabulary")))
-						.push(Button::new(&mut self.button_quit, Text::new("quit")).on_press(MsgMainMenu::Quit))
+						.push(Button::new(&mut state.button_querry, Text::new("querry vocabulary")))
+						.push(
+							Button::new(&mut state.button_add, Text::new("add vocabulary"))
+								.on_press(Message::MainMenu(MsgMainMenu::Add)),
+						)
+						.push(Button::new(&mut state.button_explore, Text::new("explore vocabulary")))
+						.push(
+							Button::new(&mut state.button_quit, Text::new("quit"))
+								.on_press(Message::MainMenu(MsgMainMenu::Quit)),
+						)
 						.push(Space::new(Length::Shrink, Length::Fill)),
 				)
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.into(),
-			AktiveMenu::Add => Column::new()
+			Window::AddVocabulary(state) => Column::new()
 				.push(
 					Row::new()
 						.push(Text::new("subject/language"))
 						.push(Text::new("both side"))
-						.push(Button::new(&mut self.add.button_add, Text::new("add vocabulary"))),
+						.push(Button::new(&mut state.button_add, Text::new("add vocabulary"))),
 				)
 				.into(),
 		}
@@ -97,5 +106,5 @@ impl Sandbox for MainMenu {
 }
 
 fn main() -> iced::Result {
-	MainMenu::run(Settings::default())
+	Window::run(Settings::default())
 }
