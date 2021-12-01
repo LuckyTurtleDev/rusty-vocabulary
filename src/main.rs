@@ -70,7 +70,7 @@ impl Sandbox for Window {
 				.push(
 					Column::new()
 						.push(Space::new(Length::Shrink, Length::Fill))
-						.push(Text::new(format!("total vocabulary: {}", state.total_vocabulary)))
+						.push(Text::new(format!("total vocabulary: {}", state.total_vocabulary))) //todo: use //align_items(Alignment::Fill)
 						.push(Text::new(format!("outstanding vocabulary: {}", state.outstanding_vocabulary)))
 						.push(Text::new(format!("subjects/languages: {}", state.subjects)))
 						.push(Space::new(Length::Shrink, Length::Fill)),
