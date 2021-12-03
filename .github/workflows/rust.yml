@@ -11,11 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: dtolnay/rust-toolchain@stable
-      - name: Install rlottie
-        run: |
-          sudo apt-get install -y libgtk-3-dev
-        env:
-          pkgver: "0.2"
       - run: cargo test --workspace --all-features
         env:
           RUST_BACKTRACE: 1
