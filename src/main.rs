@@ -1,4 +1,4 @@
-use iced::{button, widget::Space, Button, Column, Element, Length, Row, Sandbox, Settings, Text};
+use iced::{button, widget::Space, Button, Checkbox, Column, Element, Length, Row, Sandbox, Settings, Text};
 use std::process::exit;
 
 #[derive(Debug, Clone, Copy)]
@@ -8,12 +8,19 @@ pub enum MsgMainMenu {
 }
 
 #[derive(Debug, Clone, Copy)]
+pub enum MsgAddVocabulary {
+	CheckboxBothSidesToogle,
+}
+
+#[derive(Debug, Clone, Copy)]
 pub enum Message {
 	MainMenu(MsgMainMenu),
+	AddVocabulary(MsgAddVocabulary),
 }
 
 struct WinAddVocabulary {
 	button_add: button::State,
+	checkbox_both_sides: bool,
 }
 
 struct WinMainMenu {
@@ -57,7 +64,14 @@ impl Sandbox for Window {
 				MsgMainMenu::Add => {
 					*self = Window::AddVocabulary(WinAddVocabulary {
 						button_add: button::State::new(),
+						checkbox_both_sides: true,
 					})
+				},
+			},
+			Message::AddVocabulary(msg) => match msg {
+				MsgAddVocabulary::CheckboxBothSidesToogle => match self {
+					Window::AddVocabulary(state) => state.checkbox_both_sides = !state.checkbox_both_sides,
+					_ => panic!("Application is at the wrong state for this event"),
 				},
 			},
 		};
@@ -97,7 +111,9 @@ impl Sandbox for Window {
 				.push(
 					Row::new()
 						.push(Text::new("subject/language"))
-						.push(Text::new("both side"))
+						.push(Checkbox::new(state.checkbox_both_sides, "bot sides", |_| {
+							Message::AddVocabulary(MsgAddVocabulary::CheckboxBothSidesToogle)
+						}))
 						.push(Button::new(&mut state.button_add, Text::new("add vocabulary"))),
 				)
 				.into(),
