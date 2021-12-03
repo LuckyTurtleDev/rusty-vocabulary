@@ -33,13 +33,13 @@ struct WinMainMenu {
 	button_quit: button::State,
 }
 
-enum State {
+enum Activity {
 	MainMenu,
 	AddVocabulary,
 }
 
 struct Window {
-	state: State,
+	activity: Activity,
 	main_menu: WinMainMenu,
 	add_vocabulary: WinAddVocabulary,
 }
@@ -49,7 +49,7 @@ impl Sandbox for Window {
 
 	fn new() -> Window {
 		Window {
-			state: State::MainMenu,
+			activity: Activity::MainMenu,
 			main_menu: WinMainMenu {
 				total_vocabulary: 0,
 				outstanding_vocabulary: 0,
@@ -74,7 +74,7 @@ impl Sandbox for Window {
 		match message {
 			Message::MainMenu(msg) => match msg {
 				MsgMainMenu::Quit => exit(0),
-				MsgMainMenu::Add => self.state = State::AddVocabulary,
+				MsgMainMenu::Add => self.activity = Activity::AddVocabulary,
 			},
 			Message::AddVocabulary(msg) => match msg {
 				MsgAddVocabulary::CheckboxBothSidesToogle => {
@@ -85,8 +85,8 @@ impl Sandbox for Window {
 	}
 
 	fn view(&mut self) -> Element<Self::Message> {
-		match self.state {
-			State::MainMenu => Row::new()
+		match self.activity {
+			Activity::MainMenu => Row::new()
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.push(
 					Column::new()
@@ -117,7 +117,7 @@ impl Sandbox for Window {
 				)
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.into(),
-			State::AddVocabulary => Column::new()
+			Activity::AddVocabulary => Column::new()
 				.push(
 					Row::new()
 						.push(Text::new("subject/language"))
