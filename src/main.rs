@@ -12,8 +12,9 @@ pub enum MsgMainMenu {
 
 #[derive(Debug, Clone)]
 pub enum MsgAddVocabulary {
-	CheckboxBothSidesToogle,
+	Back,
 	TextInputTags(String),
+	CheckboxBothSidesToogle,
 }
 
 #[derive(Debug, Clone)]
@@ -23,10 +24,11 @@ pub enum Message {
 }
 
 struct WinAddVocabulary {
-	button_add: button::State,
-	checkbox_both_sides: bool,
+	button_back: button::State,
 	text_input_tags: text_input::State,
 	text_input_tags_value: String,
+	checkbox_both_sides: bool,
+	button_add: button::State,
 }
 
 struct WinMainMenu {
@@ -66,10 +68,11 @@ impl Sandbox for Window {
 				button_quit: button::State::new(),
 			},
 			add_vocabulary: WinAddVocabulary {
-				button_add: button::State::new(),
-				checkbox_both_sides: true,
+				button_back: button::State::new(),
 				text_input_tags: text_input::State::new(),
 				text_input_tags_value: String::new(),
+				checkbox_both_sides: true,
+				button_add: button::State::new(),
 			},
 		}
 	}
@@ -85,10 +88,11 @@ impl Sandbox for Window {
 				MsgMainMenu::Add => self.activity = Activity::AddVocabulary,
 			},
 			Message::AddVocabulary(msg) => match msg {
+				MsgAddVocabulary::Back => self.activity = Activity::MainMenu,
+				MsgAddVocabulary::TextInputTags(value) => self.add_vocabulary.text_input_tags_value = value,
 				MsgAddVocabulary::CheckboxBothSidesToogle => {
 					self.add_vocabulary.checkbox_both_sides = !self.add_vocabulary.checkbox_both_sides
 				},
-				MsgAddVocabulary::TextInputTags(value) => self.add_vocabulary.text_input_tags_value = value,
 			},
 		};
 	}
@@ -131,6 +135,11 @@ impl Sandbox for Window {
 					Row::new()
 						.padding(5)
 						.align_items(Align::Center)
+						.push(Space::new(Length::Fill, Length::Shrink))
+						.push(
+							Button::new(&mut self.add_vocabulary.button_back, Text::new("back"))
+								.on_press(Message::AddVocabulary(MsgAddVocabulary::Back)),
+						)
 						.push(Space::new(Length::Fill, Length::Shrink))
 						.push(Text::new("subject/language"))
 						.push(Space::new(Length::Fill, Length::Shrink))
