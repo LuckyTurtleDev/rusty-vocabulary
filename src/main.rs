@@ -1,4 +1,7 @@
-use iced::{button, widget::Space, Button, Checkbox, Column, Element, Length, Row, Sandbox, Settings, Text};
+use iced::{
+	button, text_input, widget::Space, Align, Button, Checkbox, Column, Element, Length, Row, Sandbox, Settings, Text,
+	TextInput,
+};
 use std::process::exit;
 
 #[derive(Debug, Clone, Copy)]
@@ -7,12 +10,13 @@ pub enum MsgMainMenu {
 	Quit,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum MsgAddVocabulary {
 	CheckboxBothSidesToogle,
+	TextInputTags(String),
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum Message {
 	MainMenu(MsgMainMenu),
 	AddVocabulary(MsgAddVocabulary),
@@ -21,6 +25,8 @@ pub enum Message {
 struct WinAddVocabulary {
 	button_add: button::State,
 	checkbox_both_sides: bool,
+	text_input_tags: text_input::State,
+	text_input_tags_value: String,
 }
 
 struct WinMainMenu {
@@ -62,6 +68,8 @@ impl Sandbox for Window {
 			add_vocabulary: WinAddVocabulary {
 				button_add: button::State::new(),
 				checkbox_both_sides: true,
+				text_input_tags: text_input::State::new(),
+				text_input_tags_value: String::new(),
 			},
 		}
 	}
@@ -80,6 +88,7 @@ impl Sandbox for Window {
 				MsgAddVocabulary::CheckboxBothSidesToogle => {
 					self.add_vocabulary.checkbox_both_sides = !self.add_vocabulary.checkbox_both_sides
 				},
+				MsgAddVocabulary::TextInputTags(value) => self.add_vocabulary.text_input_tags_value = value,
 			},
 		};
 	}
@@ -120,12 +129,27 @@ impl Sandbox for Window {
 			Activity::AddVocabulary => Column::new()
 				.push(
 					Row::new()
+						.padding(5)
+						.align_items(Align::Center)
+						.push(Space::new(Length::Fill, Length::Shrink))
 						.push(Text::new("subject/language"))
+						.push(Space::new(Length::Fill, Length::Shrink))
+						.push(Text::new("tags: "))
+						.push(TextInput::new(
+							&mut self.add_vocabulary.text_input_tags,
+							" none",
+							&self.add_vocabulary.text_input_tags_value,
+							|value| Message::AddVocabulary(MsgAddVocabulary::TextInputTags(value)),
+						))
+						.push(Space::new(Length::Fill, Length::Shrink))
 						.push(Checkbox::new(self.add_vocabulary.checkbox_both_sides, "bot sides", |_| {
 							Message::AddVocabulary(MsgAddVocabulary::CheckboxBothSidesToogle)
 						}))
-						.push(Button::new(&mut self.add_vocabulary.button_add, Text::new("add vocabulary"))),
+						.push(Space::new(Length::Fill, Length::Shrink))
+						.push(Button::new(&mut self.add_vocabulary.button_add, Text::new("add vocabulary")))
+						.push(Space::new(Length::Fill, Length::Shrink)),
 				)
+				.push(Space::new(Length::Shrink, Length::Units(5)))
 				.into(),
 		}
 	}
