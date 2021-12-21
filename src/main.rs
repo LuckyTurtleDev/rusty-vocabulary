@@ -14,6 +14,8 @@ pub enum MsgMainMenu {
 pub enum MsgAddVocabulary {
 	Back,
 	TextInputTags(String),
+	TextInputQuestion(String),
+	TextInputAnswer(String),
 	CheckboxBothSidesToogle,
 }
 
@@ -29,6 +31,10 @@ struct WinAddVocabulary {
 	text_input_tags_value: String,
 	checkbox_both_sides: bool,
 	button_add: button::State,
+	text_input_question: text_input::State,
+	text_input_question_value: String,
+	text_input_answer: text_input::State,
+	text_input_answer_value: String,
 }
 
 struct WinMainMenu {
@@ -73,6 +79,10 @@ impl Sandbox for Window {
 				text_input_tags_value: String::new(),
 				checkbox_both_sides: true,
 				button_add: button::State::new(),
+				text_input_question: text_input::State::new(),
+				text_input_question_value: String::new(),
+				text_input_answer: text_input::State::new(),
+				text_input_answer_value: String::new(),
 			},
 		}
 	}
@@ -93,6 +103,8 @@ impl Sandbox for Window {
 				MsgAddVocabulary::CheckboxBothSidesToogle => {
 					self.add_vocabulary.checkbox_both_sides = !self.add_vocabulary.checkbox_both_sides
 				},
+				MsgAddVocabulary::TextInputQuestion(value) => self.add_vocabulary.text_input_question_value = value,
+				MsgAddVocabulary::TextInputAnswer(value) => self.add_vocabulary.text_input_answer_value = value,
 			},
 		};
 	}
@@ -157,6 +169,21 @@ impl Sandbox for Window {
 						.push(Space::new(Length::Fill, Length::Shrink))
 						.push(Button::new(&mut self.add_vocabulary.button_add, Text::new("add vocabulary")))
 						.push(Space::new(Length::Fill, Length::Shrink)),
+				)
+				.push(
+					Row::new()
+						.push(TextInput::new(
+							&mut self.add_vocabulary.text_input_question,
+							"question",
+							&self.add_vocabulary.text_input_question_value,
+							|value| Message::AddVocabulary(MsgAddVocabulary::TextInputQuestion(value)),
+						))
+						.push(TextInput::new(
+							&mut self.add_vocabulary.text_input_answer,
+							"answer",
+							&self.add_vocabulary.text_input_answer_value,
+							|value| Message::AddVocabulary(MsgAddVocabulary::TextInputAnswer(value)),
+						)),
 				)
 				.push(Space::new(Length::Shrink, Length::Units(5)))
 				.into(),
