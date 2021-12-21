@@ -17,6 +17,7 @@ pub enum MsgAddVocabulary {
 	TextInputQuestion(String),
 	TextInputAnswer(String),
 	CheckboxBothSidesToogle,
+	Add,
 }
 
 #[derive(Debug, Clone)]
@@ -103,6 +104,7 @@ impl Sandbox for Window {
 				MsgAddVocabulary::CheckboxBothSidesToogle => {
 					self.add_vocabulary.checkbox_both_sides = !self.add_vocabulary.checkbox_both_sides
 				},
+				MsgAddVocabulary::Add => unimplemented!(),
 				MsgAddVocabulary::TextInputQuestion(value) => self.add_vocabulary.text_input_question_value = value,
 				MsgAddVocabulary::TextInputAnswer(value) => self.add_vocabulary.text_input_answer_value = value,
 			},
@@ -167,7 +169,10 @@ impl Sandbox for Window {
 							Message::AddVocabulary(MsgAddVocabulary::CheckboxBothSidesToogle)
 						}))
 						.push(Space::new(Length::Fill, Length::Shrink))
-						.push(Button::new(&mut self.add_vocabulary.button_add, Text::new("add vocabulary")))
+						.push(
+							Button::new(&mut self.add_vocabulary.button_add, Text::new("add vocabulary"))
+								.on_press(Message::AddVocabulary(MsgAddVocabulary::Add)),
+						)
 						.push(Space::new(Length::Fill, Length::Shrink)),
 				)
 				.push(
