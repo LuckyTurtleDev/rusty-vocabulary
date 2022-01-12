@@ -3,6 +3,19 @@ use iced::{
 	TextInput,
 };
 use std::process::exit;
+use std::fs;
+use std::path::PathBuf;
+use once_cell::sync::Lazy;
+use directories::ProjectDirs;
+use anyhow::Context;
+
+mod config;
+use config::*;
+
+const CARGO_PKG_NAME: &'static str = env!("CARGO_PKG_NAME");
+static PROJECT_DIRS: Lazy<ProjectDirs> =
+	Lazy::new(|| ProjectDirs::from("de", "lukas1818", CARGO_PKG_NAME).expect("failed to get project dirs"));
+static CONFIG_FILE: Lazy<PathBuf> = Lazy::new(|| PROJECT_DIRS.config_dir().join("config.toml"));
 
 #[derive(Debug, Clone, Copy)]
 pub enum MsgMainMenu {
@@ -54,6 +67,7 @@ enum Activity {
 }
 
 struct Window {
+	config: Config,
 	activity: Activity,
 	main_menu: WinMainMenu,
 	add_vocabulary: WinAddVocabulary,
@@ -63,8 +77,18 @@ impl Sandbox for Window {
 	type Message = Message;
 
 	fn new() -> Window {
+		let file_content = &fs::read_to_string(CONFIG_FILE.as_path()).with_context(|| "failed to open config(TODOD: enter filename here) file");
+		let file_content = match file_content
+		{
+			Ok(file_content) => file_content,
+			Err(error) => unimplemented!()
+		};
+		let config: Config = toml::from_str(&file_content).unwrap();
+		let mut activity = Activity::MainMenu;
+		if config.token.is_none() { activity = Activity::MainMenu}
 		Window {
-			activity: Activity::MainMenu,
+			config,
+			activity,
 			main_menu: WinMainMenu {
 				total_vocabulary: 0,
 				outstanding_vocabulary: 0,

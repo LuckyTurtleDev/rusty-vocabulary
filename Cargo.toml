@@ -7,4 +7,8 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
+directories = "4.0"
 iced = { version = "0.3", features = ["glow", "glow_default_system_font"], default-features = false }
+once_cell = "1.8"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.5.8"
