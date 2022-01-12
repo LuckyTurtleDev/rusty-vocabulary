@@ -1,11 +1,11 @@
-use anyhow::Context;
 use directories::ProjectDirs;
 use iced::{
 	button, text_input, widget::Space, Align, Button, Checkbox, Column, Element, Length, Row, Sandbox, Settings, Text,
 	TextInput,
 };
+use native_dialog::{MessageDialog, MessageType};
 use once_cell::sync::Lazy;
-use std::{fs, path::PathBuf, process::exit};
+use std::{fs, path::PathBuf, process::exit, string::String};
 
 mod config;
 use config::*;
@@ -76,15 +76,27 @@ impl Sandbox for Window {
 	type Message = Message;
 
 	fn new() -> Window {
-		let file_content = &fs::read_to_string(CONFIG_FILE.as_path())
-			.with_context(|| "failed to open config(TODOD: enter filename here) file");
+		let file_content = fs::read_to_string(CONFIG_FILE.as_path());
 		let file_content = match file_content {
 			Ok(file_content) => file_content,
 			Err(error) => {
-			
-			}
+				if error.kind() == std::io::ErrorKind::NotFound {
+					let error_message = format!("failed to open config file \"{}\":\n{}", CONFIG_FILE.display(), error);
+					let res = MessageDialog::new()
+						.set_type(MessageType::Error)
+						.set_title("panicked")
+						.set_text(&format!("{} panicked: {}", CARGO_PKG_NAME, error_message))
+						.show_alert();
+					if res.is_err() {
+						eprintln!("error showing error popup: {}", res.unwrap_err())
+					}
+					panic!("{}", error_message);
+				}
+				String::new()
+			},
 		};
 		let config: Config = toml::from_str(&file_content).unwrap();
+		unimplemented!(); //TODO: gui message for unwarp
 		let mut activity = Activity::MainMenu;
 		if config.token.is_none() {
 			activity = Activity::MainMenu
