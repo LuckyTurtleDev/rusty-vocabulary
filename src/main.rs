@@ -80,7 +80,9 @@ impl Sandbox for Window {
 			.with_context(|| "failed to open config(TODOD: enter filename here) file");
 		let file_content = match file_content {
 			Ok(file_content) => file_content,
-			Err(error) => unimplemented!(),
+			Err(error) => {
+			
+			}
 		};
 		let config: Config = toml::from_str(&file_content).unwrap();
 		let mut activity = Activity::MainMenu;
