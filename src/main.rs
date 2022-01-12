@@ -1,13 +1,11 @@
+use anyhow::Context;
+use directories::ProjectDirs;
 use iced::{
 	button, text_input, widget::Space, Align, Button, Checkbox, Column, Element, Length, Row, Sandbox, Settings, Text,
 	TextInput,
 };
-use std::process::exit;
-use std::fs;
-use std::path::PathBuf;
 use once_cell::sync::Lazy;
-use directories::ProjectDirs;
-use anyhow::Context;
+use std::{fs, path::PathBuf, process::exit};
 
 mod config;
 use config::*;
@@ -64,6 +62,7 @@ struct WinMainMenu {
 enum Activity {
 	MainMenu,
 	AddVocabulary,
+	Login,
 }
 
 struct Window {
@@ -77,15 +76,17 @@ impl Sandbox for Window {
 	type Message = Message;
 
 	fn new() -> Window {
-		let file_content = &fs::read_to_string(CONFIG_FILE.as_path()).with_context(|| "failed to open config(TODOD: enter filename here) file");
-		let file_content = match file_content
-		{
+		let file_content = &fs::read_to_string(CONFIG_FILE.as_path())
+			.with_context(|| "failed to open config(TODOD: enter filename here) file");
+		let file_content = match file_content {
 			Ok(file_content) => file_content,
-			Err(error) => unimplemented!()
+			Err(error) => unimplemented!(),
 		};
 		let config: Config = toml::from_str(&file_content).unwrap();
 		let mut activity = Activity::MainMenu;
-		if config.token.is_none() { activity = Activity::MainMenu}
+		if config.token.is_none() {
+			activity = Activity::MainMenu
+		}
 		Window {
 			config,
 			activity,
@@ -137,6 +138,7 @@ impl Sandbox for Window {
 
 	fn view(&mut self) -> Element<Self::Message> {
 		match self.activity {
+			Activity::Login => unimplemented!(),
 			Activity::MainMenu => Row::new()
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.push(
