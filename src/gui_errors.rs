@@ -19,7 +19,7 @@ impl<T> UnwrapGui<T> for Option<T> {
 
 #[track_caller]
 pub fn gui_exit_with_error(msg: &str, exit_code: i32) {
-	let msg = &format!("Error: {}", msg);
+	let msg = &format!("Error: {msg}");
 	let res = MessageDialog::new()
 		.set_type(MessageType::Error)
 		.set_title("Error")
@@ -34,14 +34,14 @@ pub fn gui_exit_with_error(msg: &str, exit_code: i32) {
 
 #[track_caller]
 pub fn gui_panic(msg: &str) -> ! {
-	let msg = &format!("{} panicked: {}", CARGO_PKG_NAME, msg);
+	let msg = &format!("{CARGO_PKG_NAME} panicked: {msg}");
 	let res = MessageDialog::new()
 		.set_type(MessageType::Error)
 		.set_title("panicked")
 		.set_text(msg)
 		.show_alert();
 	if res.is_err() {
-		eprintln!("Error showing error popup: {}", res.unwrap_err())
+		eprintln!("Error showing error popup: {}", res.unwrap_err());
 	}
 	panic!("{}", msg);
 }

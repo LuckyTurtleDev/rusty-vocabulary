@@ -84,7 +84,7 @@ impl Sandbox for Window {
 			Err(error) => {
 				if error.kind() == std::io::ErrorKind::NotFound {
 					gui_exit_with_error(
-						&format!("failed to open config file \"{}\":\n{}", CONFIG_FILE.display(), error),
+						&format!("failed to open config file \"{}\":\n{error}", CONFIG_FILE.display()),
 						1,
 					);
 				}
