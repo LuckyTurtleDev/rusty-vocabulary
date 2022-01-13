@@ -3,16 +3,18 @@ use iced::{
 	button, text_input, widget::Space, Align, Button, Checkbox, Column, Element, Length, Row, Sandbox, Settings, Text,
 	TextInput,
 };
-use native_dialog::{MessageDialog, MessageType};
 use once_cell::sync::Lazy;
 use std::{fs, path::PathBuf, process::exit, string::String};
+
+mod gui_errors;
+use gui_errors::*;
 
 mod config;
 use config::*;
 
 const CARGO_PKG_NAME: &'static str = env!("CARGO_PKG_NAME");
 static PROJECT_DIRS: Lazy<ProjectDirs> =
-	Lazy::new(|| ProjectDirs::from("de", "lukas1818", CARGO_PKG_NAME).expect("failed to get project dirs"));
+	Lazy::new(|| ProjectDirs::from("de", "lukas1818", CARGO_PKG_NAME).expect_gui("failed to get project dirs"));
 static CONFIG_FILE: Lazy<PathBuf> = Lazy::new(|| PROJECT_DIRS.config_dir().join("config.toml"));
 
 #[derive(Debug, Clone, Copy)]
@@ -81,16 +83,10 @@ impl Sandbox for Window {
 			Ok(file_content) => file_content,
 			Err(error) => {
 				if error.kind() == std::io::ErrorKind::NotFound {
-					let error_message = format!("failed to open config file \"{}\":\n{}", CONFIG_FILE.display(), error);
-					let res = MessageDialog::new()
-						.set_type(MessageType::Error)
-						.set_title("panicked")
-						.set_text(&format!("{} panicked: {}", CARGO_PKG_NAME, error_message))
-						.show_alert();
-					if res.is_err() {
-						eprintln!("error showing error popup: {}", res.unwrap_err())
-					}
-					panic!("{}", error_message);
+					gui_exit_with_error(
+						&format!("failed to open config file \"{}\":\n{}", CONFIG_FILE.display(), error),
+						1,
+					);
 				}
 				String::new()
 			},
