@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Default, Deserialize)]
 pub struct Config {
 	pub token: Option<String>,
 }

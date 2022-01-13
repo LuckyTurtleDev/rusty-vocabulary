@@ -79,23 +79,23 @@ impl Sandbox for Window {
 
 	fn new() -> Window {
 		let file_content = fs::read_to_string(CONFIG_FILE.as_path());
-		let file_content = match file_content {
-			Ok(file_content) => file_content,
+		let config: Config = match file_content {
+			Ok(file_content) => toml::from_str(&file_content)
+				.expect_gui_exit(&format!("failed to parse config file \"{}\"", CONFIG_FILE.display()), 1),
 			Err(error) => {
-				if error.kind() == std::io::ErrorKind::NotFound {
+				if error.kind() != std::io::ErrorKind::NotFound {
 					gui_exit_with_error(
 						&format!("failed to open config file \"{}\":\n{error}", CONFIG_FILE.display()),
 						1,
 					);
 				}
-				String::new()
+				eprintln!("config file \"{}\" not found, use default values", CONFIG_FILE.display());
+				Config::default()
 			},
 		};
-		let config: Config = toml::from_str(&file_content).unwrap();
-		unimplemented!(); //TODO: gui message for unwarp
 		let mut activity = Activity::MainMenu;
 		if config.token.is_none() {
-			activity = Activity::MainMenu
+			activity = Activity::Login
 		}
 		Window {
 			config,
