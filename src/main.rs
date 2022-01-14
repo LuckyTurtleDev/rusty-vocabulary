@@ -17,6 +17,13 @@ static PROJECT_DIRS: Lazy<ProjectDirs> =
 	Lazy::new(|| ProjectDirs::from("de", "lukas1818", CARGO_PKG_NAME).expect_gui("failed to get project dirs"));
 static CONFIG_FILE: Lazy<PathBuf> = Lazy::new(|| PROJECT_DIRS.config_dir().join("config.toml"));
 
+#[derive(Debug, Clone)]
+pub enum MsgLogin {
+	TextInputServer(String),
+	TextInputUsername(String),
+	TextInputPassword(String),
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum MsgMainMenu {
 	Add,
@@ -35,8 +42,22 @@ pub enum MsgAddVocabulary {
 
 #[derive(Debug, Clone)]
 pub enum Message {
+	Login(MsgLogin),
 	MainMenu(MsgMainMenu),
 	AddVocabulary(MsgAddVocabulary),
+}
+
+struct WinLogin {
+	text_input_server: text_input::State,
+	text_input_server_value: String,
+	text_input_username: text_input::State,
+	text_input_username_value: String,
+	text_input_password: text_input::State,
+	text_input_password_value: String,
+	text_input_repeatpassword: text_input::State,
+	text_input_repeatpassword_value: String,
+	button_register: button::State,
+	button_login: button::State,
 }
 
 struct WinAddVocabulary {
@@ -70,6 +91,7 @@ enum Activity {
 struct Window {
 	config: Config,
 	activity: Activity,
+	login: WinLogin,
 	main_menu: WinMainMenu,
 	add_vocabulary: WinAddVocabulary,
 }
@@ -100,6 +122,18 @@ impl Sandbox for Window {
 		Window {
 			config,
 			activity,
+			login: WinLogin {
+				text_input_server: text_input::State::new(),
+				text_input_server_value: String::new(),
+				text_input_username: text_input::State::new(),
+				text_input_username_value: String::new(),
+				text_input_password: text_input::State::new(),
+				text_input_password_value: String::new(),
+				text_input_repeatpassword: text_input::State::new(),
+				text_input_repeatpassword_value: String::new(),
+				button_register: button::State::new(),
+				button_login: button::State::new(),
+			},
 			main_menu: WinMainMenu {
 				total_vocabulary: 0,
 				outstanding_vocabulary: 0,
@@ -129,6 +163,11 @@ impl Sandbox for Window {
 
 	fn update(&mut self, message: Self::Message) {
 		match message {
+			Message::Login(msg) => match msg {
+				MsgLogin::TextInputServer(value) => self.login.text_input_server_value = value,
+				MsgLogin::TextInputUsername(value) => self.login.text_input_username_value = value,
+				MsgLogin::TextInputPassword(value) => self.login.text_input_password_value = value,
+			},
 			Message::MainMenu(msg) => match msg {
 				MsgMainMenu::Quit => exit(0),
 				MsgMainMenu::Add => self.activity = Activity::AddVocabulary,
@@ -148,7 +187,47 @@ impl Sandbox for Window {
 
 	fn view(&mut self) -> Element<Self::Message> {
 		match self.activity {
-			Activity::Login => unimplemented!(),
+			Activity::Login => Row::new()
+				.push(Space::with_width(Length::Fill))
+				.push(
+					Column::new()
+						.spacing(5)
+						.push(Space::with_height(Length::Fill))
+						.push(Text::new("Server: "))
+						.push(Text::new("Username: "))
+						.push(Text::new("Password: "))
+						.push(Space::with_height(Length::Fill)),
+				)
+				.push(
+					Column::new()
+						.width(Length::FillPortion(2))
+						.spacing(5)
+						.push(Space::with_height(Length::Fill))
+						.push(TextInput::new(
+							&mut self.login.text_input_server,
+							"https://rust-vocabulary.example.com",
+							&self.login.text_input_server_value,
+							|value| Message::Login(MsgLogin::TextInputServer(value)),
+						))
+						.push(TextInput::new(
+							&mut self.login.text_input_username,
+							"",
+							&self.login.text_input_username_value,
+							|value| Message::Login(MsgLogin::TextInputUsername(value)),
+						))
+						.push(
+							TextInput::new(
+								&mut self.login.text_input_password,
+								"",
+								&self.login.text_input_password_value,
+								|value| Message::Login(MsgLogin::TextInputPassword(value)),
+							)
+							.password(),
+						)
+						.push(Space::with_height(Length::Fill)),
+				)
+				.push(Space::with_width(Length::Fill))
+				.into(),
 			Activity::MainMenu => Row::new()
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.push(
