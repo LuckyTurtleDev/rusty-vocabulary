@@ -73,3 +73,16 @@ pub fn gui_panic(msg: &str) -> ! {
 	}
 	panic!("{msg}");
 }
+
+#[track_caller]
+pub fn unimplemented() -> ! {
+	let res = MessageDialog::new()
+		.set_type(MessageType::Error)
+		.set_title("unimplemented")
+		.set_text("this code/feature is unimplemented")
+		.show_alert();
+	if res.is_err() {
+		eprintln!("Error showing error popup: {}", res.unwrap_err());
+	}
+	unimplemented!();
+}

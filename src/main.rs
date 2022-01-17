@@ -22,6 +22,8 @@ pub enum MsgLogin {
 	TextInputServer(String),
 	TextInputUsername(String),
 	TextInputPassword(String),
+	Login,
+	Signin,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -167,6 +169,8 @@ impl Sandbox for Window {
 				MsgLogin::TextInputServer(value) => self.login.text_input_server_value = value,
 				MsgLogin::TextInputUsername(value) => self.login.text_input_username_value = value,
 				MsgLogin::TextInputPassword(value) => self.login.text_input_password_value = value,
+				MsgLogin::Login => unimplemented(),
+				MsgLogin::Signin => unimplemented(),
 			},
 			Message::MainMenu(msg) => match msg {
 				MsgMainMenu::Quit => exit(0),
@@ -178,7 +182,7 @@ impl Sandbox for Window {
 				MsgAddVocabulary::CheckboxBothSidesToogle => {
 					self.add_vocabulary.checkbox_both_sides = !self.add_vocabulary.checkbox_both_sides
 				},
-				MsgAddVocabulary::Add => unimplemented!(),
+				MsgAddVocabulary::Add => unimplemented(),
 				MsgAddVocabulary::TextInputQuestion(value) => self.add_vocabulary.text_input_question_value = value,
 				MsgAddVocabulary::TextInputAnswer(value) => self.add_vocabulary.text_input_answer_value = value,
 			},
@@ -233,9 +237,22 @@ impl Sandbox for Window {
 						)
 						.push(
 							Row::new()
-								.push(Button::new(&mut self.login.button_register, Text::new("Register")))
+								.push(
+									Button::new(&mut self.login.button_register, Text::new("Sign In"))
+										.on_press(Message::Login(MsgLogin::Signin)),
+								)
 								.push(Space::with_width(Length::Units(400)))
-								.push(Button::new(&mut self.login.button_login, Text::new("Login"))),
+								.push({
+									let mut button = Button::new(&mut self.login.button_login, Text::new("Login"));
+									if self.login.text_input_server_value != ""
+										&& self.login.text_input_username_value != ""
+										&& self.login.text_input_password_value != ""
+									{
+										button.on_press(Message::Login(MsgLogin::Login))
+									} else {
+										button
+									}
+								}),
 						)
 						.push(Space::with_height(Length::Fill)),
 				)
