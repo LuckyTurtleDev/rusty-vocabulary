@@ -191,43 +191,57 @@ impl Sandbox for Window {
 				.push(Space::with_width(Length::Fill))
 				.push(
 					Column::new()
-						.spacing(5)
 						.push(Space::with_height(Length::Fill))
-						.push(Text::new("Server: "))
-						.push(Text::new("Username: "))
-						.push(Text::new("Password: "))
-						.push(Space::with_height(Length::Fill)),
-				)
-				.push(
-					Column::new()
-						.width(Length::FillPortion(2))
-						.spacing(5)
-						.push(Space::with_height(Length::Fill))
-						.push(TextInput::new(
-							&mut self.login.text_input_server,
-							"https://rust-vocabulary.example.com",
-							&self.login.text_input_server_value,
-							|value| Message::Login(MsgLogin::TextInputServer(value)),
-						))
-						.push(TextInput::new(
-							&mut self.login.text_input_username,
-							"",
-							&self.login.text_input_username_value,
-							|value| Message::Login(MsgLogin::TextInputUsername(value)),
-						))
+						.spacing(20)
+						.align_items(Align::Center)
+						.push(Text::new("Login"))
 						.push(
-							TextInput::new(
-								&mut self.login.text_input_password,
-								"",
-								&self.login.text_input_password_value,
-								|value| Message::Login(MsgLogin::TextInputPassword(value)),
-							)
-							.password(),
+							Row::new()
+								.push(
+									Column::new()
+										.spacing(5)
+										.push(Text::new("Server: "))
+										.push(Text::new("Username: "))
+										.push(Text::new("Password: ")),
+								)
+								.push(
+									Column::new()
+										.width(Length::Units(500))
+										.spacing(5)
+										.push(TextInput::new(
+											&mut self.login.text_input_server,
+											"https://rust-vocabulary.example.com",
+											&self.login.text_input_server_value,
+											|value| Message::Login(MsgLogin::TextInputServer(value)),
+										))
+										.push(TextInput::new(
+											&mut self.login.text_input_username,
+											"",
+											&self.login.text_input_username_value,
+											|value| Message::Login(MsgLogin::TextInputUsername(value)),
+										))
+										.push(
+											TextInput::new(
+												&mut self.login.text_input_password,
+												"",
+												&self.login.text_input_password_value,
+												|value| Message::Login(MsgLogin::TextInputPassword(value)),
+											)
+											.password(),
+										),
+								),
+						)
+						.push(
+							Row::new()
+								.push(Button::new(&mut self.login.button_register, Text::new("Register")))
+								.push(Space::with_width(Length::Units(400)))
+								.push(Button::new(&mut self.login.button_login, Text::new("Login"))),
 						)
 						.push(Space::with_height(Length::Fill)),
 				)
 				.push(Space::with_width(Length::Fill))
 				.into(),
+
 			Activity::MainMenu => Row::new()
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.push(
