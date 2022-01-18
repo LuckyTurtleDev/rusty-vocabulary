@@ -12,6 +12,9 @@ use gui_errors::*;
 mod config;
 use config::*;
 
+mod api;
+use api::*;
+
 const CARGO_PKG_NAME: &'static str = env!("CARGO_PKG_NAME");
 static PROJECT_DIRS: Lazy<ProjectDirs> =
 	Lazy::new(|| ProjectDirs::from("de", "lukas1818", CARGO_PKG_NAME).expect_gui("failed to get project dirs"));
@@ -169,7 +172,11 @@ impl Sandbox for Window {
 				MsgLogin::TextInputServer(value) => self.login.text_input_server_value = value,
 				MsgLogin::TextInputUsername(value) => self.login.text_input_username_value = value,
 				MsgLogin::TextInputPassword(value) => self.login.text_input_password_value = value,
-				MsgLogin::Login => unimplemented(),
+				MsgLogin::Login => login(
+					&self.login.text_input_server_value,
+					&self.login.text_input_username_value,
+					&self.login.text_input_password_value,
+				),
 				MsgLogin::Signin => unimplemented(),
 			},
 			Message::MainMenu(msg) => match msg {
