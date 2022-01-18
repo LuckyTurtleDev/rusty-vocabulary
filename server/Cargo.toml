@@ -10,5 +10,6 @@ edition = "2021"
 anyhow = "1.0"
 gotham_restful = "0.6"
 log = "0.4"
+rusty-vocabulary-models = { path = "../models" }
 serde = { version = "1.0", features = ["derive"] }
 simple_logger = "1.16.0"
