@@ -3,11 +3,15 @@ extern crate log;
 
 use gotham_restful::{
 	create,
-	gotham::{self, prelude::*, router::build_simple_router},
+	gotham::{self, router::build_simple_router},
 	read_all, DrawResources, Resource, Success,
 };
+use jsonwebtoken::{encode, EncodingKey, Header};
 use rusty_vocabulary_models::*;
 use simple_logger::SimpleLogger;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+const CARGO_PKG_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 fn main() {
 	SimpleLogger::new().env().with_utc_timestamps().init().unwrap();
@@ -27,7 +31,19 @@ struct AccountResource;
 
 #[create]
 fn login(login: Login) {
-	info!("user {:?} has logged in with password {:?}", login.username, login.password);
+	debug!("user {:?} has logged in", login.username);
+	let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+	eprint!("{:?}", time);
+	let claims = Token {
+		date: time,
+		user_name: login.username.clone(),
+		server_version: CARGO_PKG_VERSION.to_owned(),
+	};
+	let token = encode(&Header::default(), &claims, &EncodingKey::from_secret("secret".as_ref()));
+	match token {
+		Err(error) => error!("failed to generate login token for user {:?} : {}", login.username, error),
+		Ok(token) => (),
+	};
 }
 
 #[derive(Resource)]
