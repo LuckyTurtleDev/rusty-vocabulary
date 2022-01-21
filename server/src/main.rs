@@ -30,7 +30,7 @@ struct AccountResource;
 
 #[derive(Debug, ResourceError)]
 pub enum LoginError {
-	#[status(FORBIDDEN)]
+	#[status(INTERNAL_SERVER_ERROR)]
 	#[display("Internal Server Error")]
 	InternalServerError,
 }
@@ -39,7 +39,6 @@ pub enum LoginError {
 fn login(login: Login) -> Result<String, LoginError> {
 	debug!("user {:?} has logged in", login.username);
 	let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-	eprint!("{:?}", time);
 	let claims = Token {
 		date: time,
 		user_name: login.username.clone(),
