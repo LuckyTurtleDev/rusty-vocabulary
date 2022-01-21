@@ -1,7 +1,7 @@
 use directories::ProjectDirs;
 use iced::{
-	button, text_input, widget::Space, Align, Button, Checkbox, Column, Element, Length, Row, Sandbox, Settings, Text,
-	TextInput,
+	button, text_input, widget::Space, Align, Button, Checkbox, Color, Column, Element, Length, Row, Sandbox, Settings,
+	Text, TextInput,
 };
 use once_cell::sync::Lazy;
 use std::{fs, path::PathBuf, process::exit, string::String};
@@ -63,6 +63,7 @@ struct WinLogin {
 	text_input_repeatpassword_value: String,
 	button_register: button::State,
 	button_login: button::State,
+	error: Option<String>,
 }
 
 struct WinAddVocabulary {
@@ -138,6 +139,7 @@ impl Sandbox for Window {
 				text_input_repeatpassword_value: String::new(),
 				button_register: button::State::new(),
 				button_login: button::State::new(),
+				error: None,
 			},
 			main_menu: WinMainMenu {
 				total_vocabulary: 0,
@@ -172,11 +174,23 @@ impl Sandbox for Window {
 				MsgLogin::TextInputServer(value) => self.login.text_input_server_value = value,
 				MsgLogin::TextInputUsername(value) => self.login.text_input_username_value = value,
 				MsgLogin::TextInputPassword(value) => self.login.text_input_password_value = value,
-				MsgLogin::Login => login(
-					&self.login.text_input_server_value,
-					&self.login.text_input_username_value,
-					&self.login.text_input_password_value,
-				),
+				MsgLogin::Login => {
+					let answer = login(
+						&self.login.text_input_server_value,
+						&self.login.text_input_username_value,
+						&self.login.text_input_password_value,
+					);
+					match answer {
+						Err(error) => {
+							eprintln!("Login Error: {}", error);
+							self.login.error = Some(error.to_string());
+						},
+						Ok(token) => {
+							self.login.error = None;
+							unimplemented();
+						},
+					}
+				},
 				MsgLogin::Signin => unimplemented(),
 			},
 			Message::MainMenu(msg) => match msg {
@@ -206,6 +220,12 @@ impl Sandbox for Window {
 						.spacing(20)
 						.align_items(Align::Center)
 						.push(Text::new("Login"))
+						.push({
+							match self.login.error.clone() {
+								Some(error) => Text::new(error).color(Color::from_rgb8(255, 0, 0)),
+								None => Text::new("").height(Length::Units(0)), //dummy text
+							}
+						})
 						.push(
 							Row::new()
 								.push(
@@ -250,7 +270,7 @@ impl Sandbox for Window {
 								)
 								.push(Space::with_width(Length::Units(400)))
 								.push({
-									let mut button = Button::new(&mut self.login.button_login, Text::new("Login"));
+									let button = Button::new(&mut self.login.button_login, Text::new("Login"));
 									if self.login.text_input_server_value != ""
 										&& self.login.text_input_username_value != ""
 										&& self.login.text_input_password_value != ""
