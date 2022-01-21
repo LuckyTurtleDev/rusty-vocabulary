@@ -4,13 +4,12 @@ extern crate log;
 use gotham_restful::{
 	create,
 	gotham::{self, router::build_simple_router},
-	read_all, DrawResources, Resource, Success,
+	read_all, DrawResources, Resource, ResourceError, Success,
 };
 use jsonwebtoken::{encode, EncodingKey, Header};
 use rusty_vocabulary_models::*;
 use simple_logger::SimpleLogger;
 use std::time::{SystemTime, UNIX_EPOCH};
-
 const CARGO_PKG_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 fn main() {
@@ -29,8 +28,15 @@ fn main() {
 #[resource(login)]
 struct AccountResource;
 
+#[derive(Debug, ResourceError)]
+pub enum LoginError {
+	#[status(FORBIDDEN)]
+	#[display("Internal Server Error")]
+	InternalServerError,
+}
+
 #[create]
-fn login(login: Login) {
+fn login(login: Login) -> Result<String, LoginError> {
 	debug!("user {:?} has logged in", login.username);
 	let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
 	eprint!("{:?}", time);
@@ -41,9 +47,12 @@ fn login(login: Login) {
 	};
 	let token = encode(&Header::default(), &claims, &EncodingKey::from_secret("secret".as_ref()));
 	match token {
-		Err(error) => error!("failed to generate login token for user {:?} : {}", login.username, error),
-		Ok(token) => (),
-	};
+		Err(error) => {
+			error!("failed to generate login token for user {:?} : {}", login.username, error);
+			Err(LoginError::InternalServerError)
+		},
+		Ok(token) => Ok(token),
+	}
 }
 
 #[derive(Resource)]
