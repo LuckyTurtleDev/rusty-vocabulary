@@ -4,7 +4,7 @@ use iced::{
 	Text, TextInput,
 };
 use once_cell::sync::Lazy;
-use std::{fs, path::PathBuf, process::exit, string::String};
+use std::{path::PathBuf, process::exit, string::String};
 
 mod gui_errors;
 use gui_errors::*;
@@ -106,21 +106,7 @@ impl Sandbox for Window {
 	type Message = Message;
 
 	fn new() -> Window {
-		let file_content = fs::read_to_string(CONFIG_FILE.as_path());
-		let config: Config = match file_content {
-			Ok(file_content) => toml::from_str(&file_content)
-				.expect_gui_exit(&format!("failed to parse config file \"{}\"", CONFIG_FILE.display()), 1),
-			Err(error) => {
-				if error.kind() != std::io::ErrorKind::NotFound {
-					gui_exit_with_error(
-						&format!("failed to open config file \"{}\":\n{error}", CONFIG_FILE.display()),
-						1,
-					);
-				}
-				eprintln!("config file \"{}\" not found, use default values", CONFIG_FILE.display());
-				Config::default()
-			},
-		};
+		let mut config = load_config();
 		let mut activity = Activity::MainMenu;
 		if config.token.is_none() {
 			activity = Activity::Login
@@ -187,7 +173,9 @@ impl Sandbox for Window {
 						},
 						Ok(token) => {
 							self.login.error = None;
-							unimplemented();
+							self.config.token = Some(token);
+							save_config(&self.config);
+							self.activity = Activity::MainMenu;
 						},
 					}
 				},
