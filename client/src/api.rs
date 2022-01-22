@@ -21,7 +21,7 @@ pub fn check_server(server: &str) -> anyhow::Result<()> {
 }
 
 pub fn login(server: &str, username: &str, password: &str) -> anyhow::Result<Token> {
-	check_server(&server).with_context(|| format!("Failed to connect to Server: "))?;
+	check_server(&server).with_context(|| format!("Failed to connect to Server"))?;
 	let answer: Token = RequestBuilder::try_new(Method::POST, format!("{server}/login"))?
 		.json(&Login {
 			username: username.into(),

@@ -182,8 +182,8 @@ impl Sandbox for Window {
 					);
 					match answer {
 						Err(error) => {
-							eprintln!("Login Error: {}", error);
-							self.login.error = Some(error.to_string());
+							eprintln!("Login Error: {error:?}");
+							self.login.error = Some(format!("{error:?}"));
 						},
 						Ok(token) => {
 							self.login.error = None;
