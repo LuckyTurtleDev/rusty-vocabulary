@@ -12,9 +12,17 @@ pub struct Info {
 	pub version: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Token {
 	pub user_name: String,
-	pub date: u64,
+	pub iat: u64,
 	pub server_version: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Status {
+	pub vocabulary: u64,
+	pub outstanding_vocabulary: u64,
+	pub subjects: u16,
+	pub outstanding_subjects: u16,
 }

@@ -277,7 +277,7 @@ impl Sandbox for Window {
 				.push(Space::with_width(Length::Fill))
 				.into(),
 			Activity::MainMenu => {
-				get_status(self.config.account.as_ref().unwrap()); //TODO
+				get_status(self.config.account.as_ref().unwrap()); //todo: switch to login page, if erro is 403
 				Row::new()
 					.push(Space::new(Length::Fill, Length::Shrink))
 					.push(

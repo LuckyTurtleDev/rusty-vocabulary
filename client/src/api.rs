@@ -10,7 +10,9 @@ pub struct Account {
 }
 
 pub fn check_server(server: &str) -> anyhow::Result<()> {
-	let answer = RequestBuilder::try_new(Method::GET, format!("{server}/info"))?.send()?;
+	let answer = RequestBuilder::try_new(Method::GET, format!("{server}/info"))?
+		.send()?
+		.error_for_status()?;
 	let info: Result<Info, attohttpc::Error> = answer.json();
 	if match info {
 		Err(_) => true,
@@ -36,14 +38,16 @@ pub fn login(server: &str, username: &str, password: &str) -> anyhow::Result<Str
 		})
 		.unwrap()
 		.send()?
+		.error_for_status()?
 		.text()?;
 	Ok(answer)
 }
 
 pub fn get_status(account: &Account) -> anyhow::Result<Status> {
-	let answer: Status = attohttpc::get(format!("{}/info", account.server))
+	let answer: Status = attohttpc::get(format!("{}/status", account.server))
 		.bearer_auth(&account.token)
 		.send()?
+		.error_for_status()?
 		.json()?;
 	Ok(answer)
 }

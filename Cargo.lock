@@ -1123,13 +1123,15 @@ dependencies = [
 [[package]]
 name = "gotham_restful"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bbf6a87997414472f86e1beadb23f5e0b0d2e60f288a1a32ac4232b0dc2c923"
+source = "git+https://github.com/msrd0/gotham_restful?branch=jwt-v8#8f2fec4fc15fbaacfc6ae657f34b596fe15b2391"
 dependencies = [
+ "base64",
+ "cookie",
  "futures-core",
  "futures-util",
  "gotham",
  "gotham_restful_derive",
+ "jsonwebtoken",
  "log",
  "serde",
  "serde_json",
@@ -1139,8 +1141,7 @@ dependencies = [
 [[package]]
 name = "gotham_restful_derive"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3483be4c7587aa26405768430eda890c59ee9bd7f932c3c1b1c2d0c647c9f38"
+source = "git+https://github.com/msrd0/gotham_restful?branch=jwt-v8#8f2fec4fc15fbaacfc6ae657f34b596fe15b2391"
 dependencies = [
  "lazy-regex",
  "paste",
