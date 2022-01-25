@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
-gotham_restful = "0.6"
+gotham_restful = { version = "0.6.0", features = ["auth"] }
 jsonwebtoken = "8.0.0-beta.7"
 log = "0.4"
 rusty-vocabulary-models = { path = "../models" }
