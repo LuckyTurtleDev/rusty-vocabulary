@@ -1,6 +1,13 @@
 use anyhow::{bail, Context};
 use attohttpc::{Method, RequestBuilder};
 use rusty_vocabulary_models::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize, Serialize)]
+pub struct Account {
+	pub token: String,
+	pub server: String,
+}
 
 pub fn check_server(server: &str) -> anyhow::Result<()> {
 	let answer = RequestBuilder::try_new(Method::GET, format!("{server}/info"))?.send()?;
@@ -30,5 +37,13 @@ pub fn login(server: &str, username: &str, password: &str) -> anyhow::Result<Str
 		.unwrap()
 		.send()?
 		.text()?;
+	Ok(answer)
+}
+
+pub fn get_status(account: &Account) -> anyhow::Result<Status> {
+	let answer: Status = attohttpc::get(format!("{}/info", account.server))
+		.bearer_auth(&account.token)
+		.send()?
+		.json()?;
 	Ok(answer)
 }

@@ -1,4 +1,4 @@
-use crate::{gui_errors::*, CONFIG_FILE};
+use crate::{api::Account, gui_errors::*, CONFIG_FILE};
 use serde::{Deserialize, Serialize};
 use std::fs;
 
@@ -40,5 +40,5 @@ pub fn save_config(config: &Config) {
 
 #[derive(Default, Deserialize, Serialize)]
 pub struct Config {
-	pub token: Option<String>,
+	pub account: Option<Account>,
 }

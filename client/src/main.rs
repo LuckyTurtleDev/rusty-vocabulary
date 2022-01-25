@@ -106,9 +106,9 @@ impl Sandbox for Window {
 	type Message = Message;
 
 	fn new() -> Window {
-		let mut config = load_config();
+		let config = load_config();
 		let mut activity = Activity::MainMenu;
-		if config.token.is_none() {
+		if config.account.is_none() {
 			activity = Activity::Login
 		}
 		Window {
@@ -173,7 +173,10 @@ impl Sandbox for Window {
 						},
 						Ok(token) => {
 							self.login.error = None;
-							self.config.token = Some(token);
+							self.config.account = Some(Account {
+								token,
+								server: self.login.text_input_server_value.clone(),
+							});
 							save_config(&self.config);
 							self.activity = Activity::MainMenu;
 						},
@@ -273,38 +276,40 @@ impl Sandbox for Window {
 				)
 				.push(Space::with_width(Length::Fill))
 				.into(),
-
-			Activity::MainMenu => Row::new()
-				.push(Space::new(Length::Fill, Length::Shrink))
-				.push(
-					Column::new()
+			Activity::MainMenu => {
+				get_status(self.config.account.as_ref().unwrap()); //TODO
+				Row::new()
+					.push(Space::new(Length::Fill, Length::Shrink))
+					.push(
+						Column::new()
 						.push(Space::new(Length::Shrink, Length::Fill))
 						.push(Text::new(format!("total vocabulary: {}", self.main_menu.total_vocabulary))) //todo: use //align_items(Alignment::Fill)
 						.push(Text::new(format!("outstanding vocabulary: {}", self.main_menu.outstanding_vocabulary)))
 						.push(Text::new(format!("subjects/languages: {}", self.main_menu.subjects)))
 						.push(Space::new(Length::Shrink, Length::Fill)),
-				)
-				.push(Space::new(iced::Length::Units(20), Length::Shrink))
-				.push(
-					Column::new()
-						.push(Space::new(Length::Shrink, Length::Fill))
-						.push(Button::new(&mut self.main_menu.button_querry, Text::new("querry vocabulary")))
-						.push(
-							Button::new(&mut self.main_menu.button_add, Text::new("add vocabulary"))
-								.on_press(Message::MainMenu(MsgMainMenu::Add)),
-						)
-						.push(Button::new(
-							&mut self.main_menu.button_explore,
-							Text::new("explore vocabulary"),
-						))
-						.push(
-							Button::new(&mut self.main_menu.button_quit, Text::new("quit"))
-								.on_press(Message::MainMenu(MsgMainMenu::Quit)),
-						)
-						.push(Space::new(Length::Shrink, Length::Fill)),
-				)
-				.push(Space::new(Length::Fill, Length::Shrink))
-				.into(),
+					)
+					.push(Space::new(iced::Length::Units(20), Length::Shrink))
+					.push(
+						Column::new()
+							.push(Space::new(Length::Shrink, Length::Fill))
+							.push(Button::new(&mut self.main_menu.button_querry, Text::new("querry vocabulary")))
+							.push(
+								Button::new(&mut self.main_menu.button_add, Text::new("add vocabulary"))
+									.on_press(Message::MainMenu(MsgMainMenu::Add)),
+							)
+							.push(Button::new(
+								&mut self.main_menu.button_explore,
+								Text::new("explore vocabulary"),
+							))
+							.push(
+								Button::new(&mut self.main_menu.button_quit, Text::new("quit"))
+									.on_press(Message::MainMenu(MsgMainMenu::Quit)),
+							)
+							.push(Space::new(Length::Shrink, Length::Fill)),
+					)
+					.push(Space::new(Length::Fill, Length::Shrink))
+					.into()
+			},
 			Activity::AddVocabulary => Column::new()
 				.push(
 					Row::new()
