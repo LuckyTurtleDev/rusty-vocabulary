@@ -107,8 +107,24 @@ impl Sandbox for Window {
 	fn new() -> Window {
 		let config = load_config();
 		let mut activity = Activity::MainMenu;
+		let mut status = rusty_vocabulary_models::Status::default();
 		if config.account.is_none() {
 			activity = Activity::Login
+		} else {
+			let answer = get_status(config.account.as_ref().unwrap());
+			match answer {
+				Ok(value) => status = value,
+				Err(error) => match error.kind() {
+					attohttpc::ErrorKind::StatusCode(code) => {
+						if *code == 403 {
+							activity = Activity::Login
+						} else {
+							gui_panic(&format!("request failed: {:?}", error));
+						}
+					},
+					_ => gui_panic(&format!("request failed: {:?}", error)),
+				},
+			}
 		}
 		Window {
 			config,
@@ -127,12 +143,7 @@ impl Sandbox for Window {
 				error: None,
 			},
 			main_menu: WinMainMenu {
-				status: rusty_vocabulary_models::Status {
-					vocabulary: 0,
-					subjects: 0,
-					outstanding_subjects: 0,
-					outstanding_vocabulary: 0,
-				},
+				status,
 				button_querry: button::State::new(),
 				button_add: button::State::new(),
 				button_explore: button::State::new(),

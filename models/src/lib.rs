@@ -19,7 +19,7 @@ pub struct Token {
 	pub server_version: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize)]
 pub struct Status {
 	pub vocabulary: u64,
 	pub outstanding_vocabulary: u64,
