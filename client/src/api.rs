@@ -43,11 +43,10 @@ pub fn login(server: &str, username: &str, password: &str) -> anyhow::Result<Str
 	Ok(answer)
 }
 
-pub fn get_status(account: &Account) -> anyhow::Result<Status> {
-	let answer: Status = attohttpc::get(format!("{}/status", account.server))
+pub fn get_status(account: &Account) -> attohttpc::Result<Status> {
+	attohttpc::get(format!("{}/status", account.server))
 		.bearer_auth(&account.token)
 		.send()?
 		.error_for_status()?
-		.json()?;
-	Ok(answer)
+		.json()
 }

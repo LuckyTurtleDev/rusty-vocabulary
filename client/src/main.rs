@@ -79,15 +79,14 @@ struct WinAddVocabulary {
 }
 
 struct WinMainMenu {
-	total_vocabulary: u32,
-	outstanding_vocabulary: u32,
-	subjects: u16,
+	status: rusty_vocabulary_models::Status,
 	button_querry: button::State,
 	button_add: button::State,
 	button_explore: button::State,
 	button_quit: button::State,
 }
 
+#[derive(PartialEq)]
 enum Activity {
 	MainMenu,
 	AddVocabulary,
@@ -128,9 +127,12 @@ impl Sandbox for Window {
 				error: None,
 			},
 			main_menu: WinMainMenu {
-				total_vocabulary: 0,
-				outstanding_vocabulary: 0,
-				subjects: 0,
+				status: rusty_vocabulary_models::Status {
+					vocabulary: 0,
+					subjects: 0,
+					outstanding_subjects: 0,
+					outstanding_vocabulary: 0,
+				},
 				button_querry: button::State::new(),
 				button_add: button::State::new(),
 				button_explore: button::State::new(),
@@ -199,6 +201,22 @@ impl Sandbox for Window {
 				MsgAddVocabulary::TextInputAnswer(value) => self.add_vocabulary.text_input_answer_value = value,
 			},
 		};
+		if self.activity == Activity::MainMenu {
+			let answer = get_status(self.config.account.as_ref().unwrap());
+			match answer {
+				Ok(status) => self.main_menu.status = status,
+				Err(error) => match error.kind() {
+					attohttpc::ErrorKind::StatusCode(code) => {
+						if *code == 403 {
+							self.activity = Activity::Login
+						} else {
+							gui_panic(&format!("request failed: {:?}", error));
+						}
+					},
+					_ => gui_panic(&format!("request failed: {:?}", error)),
+				},
+			}
+		}
 	}
 
 	fn view(&mut self) -> Element<Self::Message> {
@@ -277,15 +295,14 @@ impl Sandbox for Window {
 				.push(Space::with_width(Length::Fill))
 				.into(),
 			Activity::MainMenu => {
-				get_status(self.config.account.as_ref().unwrap()); //todo: switch to login page, if erro is 403
 				Row::new()
 					.push(Space::new(Length::Fill, Length::Shrink))
 					.push(
 						Column::new()
 						.push(Space::new(Length::Shrink, Length::Fill))
-						.push(Text::new(format!("total vocabulary: {}", self.main_menu.total_vocabulary))) //todo: use //align_items(Alignment::Fill)
-						.push(Text::new(format!("outstanding vocabulary: {}", self.main_menu.outstanding_vocabulary)))
-						.push(Text::new(format!("subjects/languages: {}", self.main_menu.subjects)))
+						.push(Text::new(format!("total vocabulary: {}", self.main_menu.status.vocabulary))) //todo: use //align_items(Alignment::Fill)
+						.push(Text::new(format!("outstanding vocabulary: {}", self.main_menu.status.outstanding_vocabulary)))
+						.push(Text::new(format!("subjects/languages: {}", self.main_menu.status.subjects)))
 						.push(Space::new(Length::Shrink, Length::Fill)),
 					)
 					.push(Space::new(iced::Length::Units(20), Length::Shrink))
