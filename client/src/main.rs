@@ -59,9 +59,6 @@ struct WinLogin {
 	text_input_username_value: String,
 	text_input_password: text_input::State,
 	text_input_password_value: String,
-	text_input_repeatpassword: text_input::State,
-	text_input_repeatpassword_value: String,
-	button_register: button::State,
 	button_login: button::State,
 	error: Option<String>,
 }
@@ -126,9 +123,6 @@ impl Sandbox for Window {
 				text_input_username_value: String::new(),
 				text_input_password: text_input::State::new(),
 				text_input_password_value: String::new(),
-				text_input_repeatpassword: text_input::State::new(),
-				text_input_repeatpassword_value: String::new(),
-				button_register: button::State::new(),
 				button_login: button::State::new(),
 				error: None,
 			},
@@ -263,25 +257,17 @@ impl Sandbox for Window {
 										),
 								),
 						)
-						.push(
-							Row::new()
-								.push(
-									Button::new(&mut self.login.button_register, Text::new("Sign In"))
-										.on_press(Message::Login(MsgLogin::Signin)),
-								)
-								.push(Space::with_width(Length::Units(400)))
-								.push({
-									let button = Button::new(&mut self.login.button_login, Text::new("Login"));
-									if self.login.text_input_server_value != ""
-										&& self.login.text_input_username_value != ""
-										&& self.login.text_input_password_value != ""
-									{
-										button.on_press(Message::Login(MsgLogin::Login))
-									} else {
-										button
-									}
-								}),
-						)
+						.push(Row::new().push({
+							let button = Button::new(&mut self.login.button_login, Text::new("Login"));
+							if self.login.text_input_server_value != ""
+								&& self.login.text_input_username_value != ""
+								&& self.login.text_input_password_value != ""
+							{
+								button.on_press(Message::Login(MsgLogin::Login))
+							} else {
+								button
+							}
+						}))
 						.push(Space::with_height(Length::Fill)),
 				)
 				.push(Space::with_width(Length::Fill))
