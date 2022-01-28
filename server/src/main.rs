@@ -13,6 +13,8 @@ use rusty_vocabulary_models::*;
 use simple_logger::SimpleLogger;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+const KEY: &[u8] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
+
 const CARGO_PKG_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 fn main() {
@@ -20,7 +22,7 @@ fn main() {
 	let auth: AuthMiddleware<Token, _> = AuthMiddleware::new(
 		AuthSource::AuthorizationHeader,
 		AuthValidation::default(),
-		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc"),
+		StaticAuthHandler::from_array(KEY),
 	);
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
 	gotham::start(
@@ -55,7 +57,7 @@ fn login(login: Login) -> Result<String, LoginError> {
 		user_name: login.username.clone(),
 		server_version: CARGO_PKG_VERSION.to_owned(),
 	};
-	let token = encode(&Header::default(), &claims, &EncodingKey::from_secret("secret".as_ref()));
+	let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(KEY));
 	match token {
 		Err(error) => {
 			error!("failed to generate login token for user {:?} : {}", login.username, error);
@@ -86,6 +88,7 @@ struct StatusResource;
 fn status(auth: AuthStatus<Token>) -> AuthResult<Status, anyhow::Error> {
 	warn!("status is still unimplemented");
 	let token = auth.ok()?;
+	warn!("teie");
 	let status = Status {
 		vocabulary: 42,
 		outstanding_vocabulary: 42,
