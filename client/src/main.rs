@@ -87,7 +87,7 @@ struct WinMainMenu {
 }
 
 #[derive(PartialEq)]
-enum Activity {
+pub enum Activity {
 	MainMenu,
 	AddVocabulary,
 	Login,
@@ -111,20 +111,10 @@ impl Sandbox for Window {
 		if config.account.is_none() {
 			activity = Activity::Login
 		} else {
-			let answer = get_status(config.account.as_ref().unwrap());
-			match answer {
-				Ok(value) => status = value,
-				Err(error) => match error.kind() {
-					attohttpc::ErrorKind::StatusCode(code) => {
-						if *code == 403 {
-							activity = Activity::Login
-						} else {
-							gui_panic(&format!("request failed: {:?}", error));
-						}
-					},
-					_ => gui_panic(&format!("request failed: {:?}", error)),
-				},
-			}
+			let answer = get_status(config.account.as_ref().unwrap()).login_for_auth_error_else_panic(&mut activity, None);
+			if let Some(value) = answer {
+				status = value
+			};
 		}
 		Window {
 			config,
@@ -213,20 +203,11 @@ impl Sandbox for Window {
 			},
 		};
 		if self.activity == Activity::MainMenu {
-			let answer = get_status(self.config.account.as_ref().unwrap());
-			match answer {
-				Ok(status) => self.main_menu.status = status,
-				Err(error) => match error.kind() {
-					attohttpc::ErrorKind::StatusCode(code) => {
-						if *code == 403 {
-							self.activity = Activity::Login
-						} else {
-							gui_panic(&format!("request failed: {:?}", error));
-						}
-					},
-					_ => gui_panic(&format!("request failed: {:?}", error)),
-				},
-			}
+			let answer =
+				get_status(self.config.account.as_ref().unwrap()).login_for_auth_error_else_panic(&mut self.activity, None);
+			if let Some(value) = answer {
+				self.main_menu.status = value
+			};
 		}
 	}
 

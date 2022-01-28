@@ -1,3 +1,4 @@
+use crate::{gui_panic, Activity};
 use anyhow::{bail, Context};
 use attohttpc::{Method, RequestBuilder};
 use rusty_vocabulary_models::*;
@@ -49,4 +50,27 @@ pub fn get_status(account: &Account) -> attohttpc::Result<Status> {
 		.send()?
 		.error_for_status()?
 		.json()
+}
+
+pub trait LoginForAuthError<T> {
+	fn login_for_auth_error_else_panic(self, activity: &mut crate::Activity, msg: Option<&str>) -> Option<T>;
+}
+
+impl<T> LoginForAuthError<T> for attohttpc::Result<T> {
+	fn login_for_auth_error_else_panic(self, activity: &mut crate::Activity, msg: Option<&str>) -> Option<T> {
+		match self {
+			Ok(value) => Some(value),
+			Err(error) => match error.kind() {
+				attohttpc::ErrorKind::StatusCode(code) => {
+					if *code == 403 {
+						*activity = Activity::Login
+					} else {
+						gui_panic(&format!("{} {:?}", msg.unwrap_or("request failed:"), error));
+					};
+					None
+				},
+				_ => gui_panic(&format!("{} {:?}", msg.unwrap_or("request failed:"), error)),
+			},
+		}
+	}
 }
