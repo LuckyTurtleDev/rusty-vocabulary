@@ -2369,7 +2369,6 @@ dependencies = [
  "gotham_restful",
  "jsonwebtoken",
  "log",
- "mime",
  "rusty-vocabulary-models",
  "serde",
  "simple_logger",

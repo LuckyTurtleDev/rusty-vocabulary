@@ -5,11 +5,10 @@ use crate::gotham::pipeline::{new_pipeline, single_pipeline};
 use gotham_restful::{
 	create,
 	gotham::{self, router::build_router},
-	read_all, AuthError, AuthMiddleware, AuthResult, AuthSource, AuthStatus, AuthValidation, DrawResources, Raw, Resource,
+	read_all, AuthMiddleware, AuthResult, AuthSource, AuthStatus, AuthValidation, DrawResources, Raw, Resource,
 	ResourceError, StaticAuthHandler, Success,
 };
 use jsonwebtoken::{encode, EncodingKey, Header};
-use mime::Mime;
 use rusty_vocabulary_models::*;
 use simple_logger::SimpleLogger;
 use std::time::{SystemTime, UNIX_EPOCH};
