@@ -5,10 +5,11 @@ use crate::gotham::pipeline::{new_pipeline, single_pipeline};
 use gotham_restful::{
 	create,
 	gotham::{self, router::build_router},
-	read_all, AuthError, AuthMiddleware, AuthResult, AuthSource, AuthStatus, AuthValidation, DrawResources, Resource,
+	read_all, AuthError, AuthMiddleware, AuthResult, AuthSource, AuthStatus, AuthValidation, DrawResources, Raw, Resource,
 	ResourceError, StaticAuthHandler, Success,
 };
 use jsonwebtoken::{encode, EncodingKey, Header};
+use mime::Mime;
 use rusty_vocabulary_models::*;
 use simple_logger::SimpleLogger;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -48,7 +49,7 @@ pub enum LoginError {
 }
 
 #[create]
-fn login(login: Login) -> Result<String, LoginError> {
+fn login(login: Login) -> Result<Raw<String>, LoginError> {
 	debug!("user {:?} has logged in", login.username);
 	warn!("login is still unimplemented");
 	let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
@@ -63,7 +64,10 @@ fn login(login: Login) -> Result<String, LoginError> {
 			error!("failed to generate login token for user {:?} : {}", login.username, error);
 			Err(LoginError::InternalServerError)
 		},
-		Ok(token) => Ok(token),
+		Ok(token) => Ok(Raw {
+			raw: token,
+			mime: mime::TEXT_PLAIN,
+		}),
 	}
 }
 

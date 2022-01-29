@@ -63,6 +63,7 @@ impl<T> LoginForAuthError<T> for attohttpc::Result<T> {
 			Err(error) => match error.kind() {
 				attohttpc::ErrorKind::StatusCode(code) => {
 					if *code == 403 {
+						eprintln!("Request failed: {error:?}");
 						*activity = Activity::Login
 					} else {
 						gui_panic(&format!("{} {:?}", msg.unwrap_or("request failed:"), error));
