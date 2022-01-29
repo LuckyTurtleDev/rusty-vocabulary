@@ -32,6 +32,7 @@ fn main() {
 			route.resource::<InfoResource>("info");
 			route.resource::<LoginResource>("login");
 			route.resource::<StatusResource>("status");
+			route.resource::<StatusResource>("card");
 		}),
 	)
 	.unwrap();
@@ -99,4 +100,20 @@ fn status(auth: AuthStatus<Token>) -> AuthResult<Status, anyhow::Error> {
 		outstanding_subjects: 42,
 	};
 	Ok(status)
+}
+
+#[derive(Resource)]
+#[resource(card)]
+struct CardResource;
+
+#[read_all]
+fn card(auth: AuthStatus<Token>) -> AuthResult<Vec<CardPartial>, anyhow::Error> {
+	warn!("card is still unimplemented");
+	let token = auth.ok()?;
+	let card = CardPartial {
+		question: "This is a question?".into(),
+		answer: "and this is the answer".into(),
+		id: 42,
+	};
+	Ok(vec![card])
 }

@@ -31,6 +31,7 @@ pub enum MsgLogin {
 
 #[derive(Debug, Clone, Copy)]
 pub enum MsgMainMenu {
+	Querry,
 	Add,
 	Quit,
 }
@@ -86,6 +87,7 @@ struct WinMainMenu {
 #[derive(PartialEq)]
 pub enum Activity {
 	MainMenu,
+	Querry,
 	AddVocabulary,
 	Login,
 }
@@ -184,6 +186,7 @@ impl Sandbox for Window {
 			Message::MainMenu(msg) => match msg {
 				MsgMainMenu::Quit => exit(0),
 				MsgMainMenu::Add => self.activity = Activity::AddVocabulary,
+				MsgMainMenu::Querry => self.activity = Activity::Querry,
 			},
 			Message::AddVocabulary(msg) => match msg {
 				MsgAddVocabulary::Back => self.activity = Activity::MainMenu,
@@ -287,7 +290,10 @@ impl Sandbox for Window {
 					.push(
 						Column::new()
 							.push(Space::new(Length::Shrink, Length::Fill))
-							.push(Button::new(&mut self.main_menu.button_querry, Text::new("querry vocabulary")))
+							.push(
+								Button::new(&mut self.main_menu.button_querry, Text::new("querry vocabulary"))
+									.on_press(Message::MainMenu(MsgMainMenu::Querry)),
+							)
 							.push(
 								Button::new(&mut self.main_menu.button_add, Text::new("add vocabulary"))
 									.on_press(Message::MainMenu(MsgMainMenu::Add)),
@@ -305,6 +311,7 @@ impl Sandbox for Window {
 					.push(Space::new(Length::Fill, Length::Shrink))
 					.into()
 			},
+			Activity::Querry => Text::new("TODO").into(),
 			Activity::AddVocabulary => Column::new()
 				.push(
 					Row::new()

@@ -26,3 +26,10 @@ pub struct Status {
 	pub subjects: u16,
 	pub outstanding_subjects: u16,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct CardPartial {
+	pub question: String,
+	pub answer: String,
+	pub id: u64,
+}
