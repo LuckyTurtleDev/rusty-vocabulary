@@ -16,7 +16,7 @@ pub struct Info {
 pub struct Token {
 	pub user_name: String,
 	pub iat: u64,
-	pub server_version: String,
+	pub exp: u64,
 }
 
 #[derive(Default, Deserialize, Serialize)]

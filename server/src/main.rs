@@ -15,6 +15,7 @@ use simple_logger::SimpleLogger;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const KEY: &[u8] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
+const EXP: u64 = 63115200; // 2 years
 
 const CARGO_PKG_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
@@ -55,8 +56,8 @@ fn login(login: Login) -> Result<Raw<String>, LoginError> {
 	let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
 	let claims = Token {
 		iat: time,
+		exp: time + EXP,
 		user_name: login.username.clone(),
-		server_version: CARGO_PKG_VERSION.to_owned(),
 	};
 	let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(KEY));
 	match token {
@@ -92,7 +93,6 @@ struct StatusResource;
 fn status(auth: AuthStatus<Token>) -> AuthResult<Status, anyhow::Error> {
 	warn!("status is still unimplemented");
 	let token = auth.ok()?;
-	warn!("teie");
 	let status = Status {
 		vocabulary: 42,
 		outstanding_vocabulary: 42,
