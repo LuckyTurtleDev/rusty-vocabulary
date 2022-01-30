@@ -15,6 +15,9 @@ use config::*;
 mod api;
 use api::*;
 
+mod activitys;
+use activitys::main_menu::*;
+
 const CARGO_PKG_NAME: &'static str = env!("CARGO_PKG_NAME");
 static PROJECT_DIRS: Lazy<ProjectDirs> =
 	Lazy::new(|| ProjectDirs::from("de", "lukas1818", CARGO_PKG_NAME).expect_gui("failed to get project dirs"));
@@ -27,13 +30,6 @@ pub enum MsgLogin {
 	TextInputPassword(String),
 	Login,
 	Signin,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum MsgMainMenu {
-	Query,
-	Add,
-	Quit,
 }
 
 #[derive(Debug, Clone)]
@@ -76,14 +72,6 @@ struct WinAddVocabulary {
 	text_input_answer_value: String,
 }
 
-struct WinMainMenu {
-	status: rusty_vocabulary_models::Status,
-	button_query: button::State,
-	button_add: button::State,
-	button_explore: button::State,
-	button_quit: button::State,
-}
-
 #[derive(PartialEq)]
 pub enum Activity {
 	MainMenu,
@@ -92,7 +80,7 @@ pub enum Activity {
 	Login,
 }
 
-struct Window {
+pub struct Window {
 	config: Config,
 	activity: Activity,
 	login: WinLogin,
@@ -128,13 +116,7 @@ impl Sandbox for Window {
 				button_login: button::State::new(),
 				error: None,
 			},
-			main_menu: WinMainMenu {
-				status,
-				button_query: button::State::new(),
-				button_add: button::State::new(),
-				button_explore: button::State::new(),
-				button_quit: button::State::new(),
-			},
+			main_menu: activitys::main_menu::new(status),
 			add_vocabulary: WinAddVocabulary {
 				button_back: button::State::new(),
 				text_input_tags: text_input::State::new(),
@@ -183,11 +165,7 @@ impl Sandbox for Window {
 				},
 				MsgLogin::Signin => unimplemented(),
 			},
-			Message::MainMenu(msg) => match msg {
-				MsgMainMenu::Quit => exit(0),
-				MsgMainMenu::Add => self.activity = Activity::AddVocabulary,
-				MsgMainMenu::Query => self.activity = Activity::Query,
-			},
+			Message::MainMenu(msg) => activitys::main_menu::update(self, msg),
 			Message::AddVocabulary(msg) => match msg {
 				MsgAddVocabulary::Back => self.activity = Activity::MainMenu,
 				MsgAddVocabulary::TextInputTags(value) => self.add_vocabulary.text_input_tags_value = value,
@@ -275,42 +253,7 @@ impl Sandbox for Window {
 				)
 				.push(Space::with_width(Length::Fill))
 				.into(),
-			Activity::MainMenu => {
-				Row::new()
-					.push(Space::new(Length::Fill, Length::Shrink))
-					.push(
-						Column::new()
-						.push(Space::new(Length::Shrink, Length::Fill))
-						.push(Text::new(format!("total vocabulary: {}", self.main_menu.status.vocabulary))) //todo: use //align_items(Alignment::Fill)
-						.push(Text::new(format!("outstanding vocabulary: {}", self.main_menu.status.outstanding_vocabulary)))
-						.push(Text::new(format!("subjects/languages: {}", self.main_menu.status.subjects)))
-						.push(Space::new(Length::Shrink, Length::Fill)),
-					)
-					.push(Space::new(iced::Length::Units(20), Length::Shrink))
-					.push(
-						Column::new()
-							.push(Space::new(Length::Shrink, Length::Fill))
-							.push(
-								Button::new(&mut self.main_menu.button_query, Text::new("query vocabulary"))
-									.on_press(Message::MainMenu(MsgMainMenu::Query)),
-							)
-							.push(
-								Button::new(&mut self.main_menu.button_add, Text::new("add vocabulary"))
-									.on_press(Message::MainMenu(MsgMainMenu::Add)),
-							)
-							.push(Button::new(
-								&mut self.main_menu.button_explore,
-								Text::new("explore vocabulary"),
-							))
-							.push(
-								Button::new(&mut self.main_menu.button_quit, Text::new("quit"))
-									.on_press(Message::MainMenu(MsgMainMenu::Quit)),
-							)
-							.push(Space::new(Length::Shrink, Length::Fill)),
-					)
-					.push(Space::new(Length::Fill, Length::Shrink))
-					.into()
-			},
+			Activity::MainMenu => activitys::main_menu::view(self),
 			Activity::Query => Text::new("TODO").into(),
 			Activity::AddVocabulary => Column::new()
 				.push(
