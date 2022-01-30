@@ -31,7 +31,7 @@ pub enum MsgLogin {
 
 #[derive(Debug, Clone, Copy)]
 pub enum MsgMainMenu {
-	Querry,
+	Query,
 	Add,
 	Quit,
 }
@@ -78,7 +78,7 @@ struct WinAddVocabulary {
 
 struct WinMainMenu {
 	status: rusty_vocabulary_models::Status,
-	button_querry: button::State,
+	button_query: button::State,
 	button_add: button::State,
 	button_explore: button::State,
 	button_quit: button::State,
@@ -87,7 +87,7 @@ struct WinMainMenu {
 #[derive(PartialEq)]
 pub enum Activity {
 	MainMenu,
-	Querry,
+	Query,
 	AddVocabulary,
 	Login,
 }
@@ -130,7 +130,7 @@ impl Sandbox for Window {
 			},
 			main_menu: WinMainMenu {
 				status,
-				button_querry: button::State::new(),
+				button_query: button::State::new(),
 				button_add: button::State::new(),
 				button_explore: button::State::new(),
 				button_quit: button::State::new(),
@@ -186,7 +186,7 @@ impl Sandbox for Window {
 			Message::MainMenu(msg) => match msg {
 				MsgMainMenu::Quit => exit(0),
 				MsgMainMenu::Add => self.activity = Activity::AddVocabulary,
-				MsgMainMenu::Querry => self.activity = Activity::Querry,
+				MsgMainMenu::Query => self.activity = Activity::Query,
 			},
 			Message::AddVocabulary(msg) => match msg {
 				MsgAddVocabulary::Back => self.activity = Activity::MainMenu,
@@ -291,8 +291,8 @@ impl Sandbox for Window {
 						Column::new()
 							.push(Space::new(Length::Shrink, Length::Fill))
 							.push(
-								Button::new(&mut self.main_menu.button_querry, Text::new("querry vocabulary"))
-									.on_press(Message::MainMenu(MsgMainMenu::Querry)),
+								Button::new(&mut self.main_menu.button_query, Text::new("query vocabulary"))
+									.on_press(Message::MainMenu(MsgMainMenu::Query)),
 							)
 							.push(
 								Button::new(&mut self.main_menu.button_add, Text::new("add vocabulary"))
@@ -311,7 +311,7 @@ impl Sandbox for Window {
 					.push(Space::new(Length::Fill, Length::Shrink))
 					.into()
 			},
-			Activity::Querry => Text::new("TODO").into(),
+			Activity::Query => Text::new("TODO").into(),
 			Activity::AddVocabulary => Column::new()
 				.push(
 					Row::new()
