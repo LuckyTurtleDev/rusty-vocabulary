@@ -3,6 +3,8 @@ use std::process::exit;
 
 use rusty_vocabulary_models::Status;
 
+use crate::api::*;
+
 use super::{Activity, Message};
 
 #[derive(Debug, Clone, Copy)]
@@ -33,9 +35,16 @@ pub fn new(status: Status) -> WinMainMenu {
 pub fn update(win: &mut super::Window, message: MsgMainMenu) {
 	match message {
 		MsgMainMenu::Quit => exit(0),
-		MsgMainMenu::Add => win.activity = Activity::AddVocabulary,
+		MsgMainMenu::Add => win.activity = Activity::Add,
 		MsgMainMenu::Query => win.activity = Activity::Query,
 	}
+}
+
+pub fn post_update(win: &mut super::Window) {
+	let answer = get_status(win.config.account.as_ref().unwrap()).login_for_auth_error_else_panic(&mut win.activity, None);
+	if let Some(value) = answer {
+		win.main_menu.status = value
+	};
 }
 
 pub fn view(win: &mut super::Window) -> Element<super::Message> {
