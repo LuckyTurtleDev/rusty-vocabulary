@@ -52,6 +52,10 @@ pub fn get_status(account: &Account) -> attohttpc::Result<Status> {
 		.json()
 }
 
+pub fn add_card(account: &Account, card: card::New) -> attohttpc::Result<Status> {
+	unimplemented!();
+}
+
 pub trait LoginForAuthError<T> {
 	fn login_for_auth_error_else_panic(self, activity: &mut Activity, msg: Option<&str>) -> Option<T>;
 }

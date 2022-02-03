@@ -27,9 +27,52 @@ pub struct Status {
 	pub outstanding_subjects: u16,
 }
 
-#[derive(Deserialize, Serialize)]
-pub struct CardPartial {
-	pub question: String,
-	pub answer: String,
-	pub id: u64,
+pub mod card {
+	use serde::{Deserialize, Serialize};
+
+	#[derive(Deserialize, Serialize)]
+	pub struct Content {
+		pub question: String,
+		pub answer: String,
+	}
+
+	#[derive(Deserialize, Serialize)]
+	pub struct MetaData {
+		pub subject: String,
+		pub tags: Vec<String>,
+	}
+
+	#[derive(Deserialize, Serialize)]
+	pub struct Rating {
+		pub repetition: u16,
+		pub easiness: f32,
+		pub due_date: u64,
+	}
+
+	#[derive(Deserialize, Serialize)]
+	pub struct Full {
+		pub id: u64,
+		pub content: Content,
+		pub meta_data: MetaData,
+		pub rating: Rating,
+	}
+
+	#[derive(Deserialize, Serialize)]
+	pub struct Small {
+		pub id: u64,
+		pub content: Content,
+	}
+
+	#[derive(Deserialize, Serialize)]
+	pub struct Medium {
+		pub id: u64,
+		pub content: Content,
+		pub meta_data: MetaData,
+	}
+
+	#[derive(Deserialize, Serialize)]
+	pub struct New {
+		pub content: Content,
+		pub meta_data: MetaData,
+	}
 }

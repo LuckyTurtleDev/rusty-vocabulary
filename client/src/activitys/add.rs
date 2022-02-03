@@ -2,7 +2,8 @@ use iced::{button, text_input, widget::Space, Align, Button, Checkbox, Column, E
 
 use std::string::String;
 
-use crate::gui_errors::*;
+use crate::api::add_card;
+use rusty_vocabulary_models::card;
 
 use super::{Activity, Message};
 
@@ -47,7 +48,24 @@ pub fn update(win: &mut super::Window, message: MsgAdd) {
 		MsgAdd::Back => win.activity = Activity::MainMenu,
 		MsgAdd::TextInputTags(value) => win.add_vocabulary.text_input_tags_value = value,
 		MsgAdd::CheckboxBothSidesToogle => win.add_vocabulary.checkbox_both_sides = !win.add_vocabulary.checkbox_both_sides,
-		MsgAdd::Add => unimplemented(),
+		MsgAdd::Add => {
+			let card = card::New {
+				content: card::Content {
+					question: win.add_vocabulary.text_input_question_value.clone(),
+					answer: win.add_vocabulary.text_input_answer_value.clone(),
+				},
+				meta_data: card::MetaData {
+					subject: "todo".into(),
+					tags: win
+						.add_vocabulary
+						.text_input_tags_value
+						.split(' ')
+						.map(|s| s.to_string())
+						.collect(),
+				},
+			};
+			add_card(win.config.account.as_ref().unwrap(), card); //todo
+		},
 		MsgAdd::TextInputQuestion(value) => win.add_vocabulary.text_input_question_value = value,
 		MsgAdd::TextInputAnswer(value) => win.add_vocabulary.text_input_answer_value = value,
 	}
