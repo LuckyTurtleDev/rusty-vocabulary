@@ -25,7 +25,7 @@ pub struct Window {
 	activity: Activity,
 	login: WinLogin,
 	main_menu: WinMainMenu,
-	add_vocabulary: WinAdd,
+	add: WinAdd,
 }
 
 impl Sandbox for Window {
@@ -48,7 +48,7 @@ impl Sandbox for Window {
 			activity,
 			login: activitys::login::new(),
 			main_menu: activitys::main_menu::new(status),
-			add_vocabulary: activitys::add::new(),
+			add: activitys::add::new(),
 		}
 	}
 

@@ -46,28 +46,23 @@ pub fn new() -> WinAdd {
 pub fn update(win: &mut super::Window, message: MsgAdd) {
 	match message {
 		MsgAdd::Back => win.activity = Activity::MainMenu,
-		MsgAdd::TextInputTags(value) => win.add_vocabulary.text_input_tags_value = value,
-		MsgAdd::CheckboxBothSidesToogle => win.add_vocabulary.checkbox_both_sides = !win.add_vocabulary.checkbox_both_sides,
+		MsgAdd::TextInputTags(value) => win.add.text_input_tags_value = value,
+		MsgAdd::CheckboxBothSidesToogle => win.add.checkbox_both_sides = !win.add.checkbox_both_sides,
 		MsgAdd::Add => {
 			let card = card::New {
 				content: card::Content {
-					question: win.add_vocabulary.text_input_question_value.clone(),
-					answer: win.add_vocabulary.text_input_answer_value.clone(),
+					question: win.add.text_input_question_value.clone(),
+					answer: win.add.text_input_answer_value.clone(),
 				},
 				meta_data: card::MetaData {
 					subject: "todo".into(),
-					tags: win
-						.add_vocabulary
-						.text_input_tags_value
-						.split(' ')
-						.map(|s| s.to_string())
-						.collect(),
+					tags: win.add.text_input_tags_value.split(' ').map(|s| s.to_string()).collect(),
 				},
 			};
 			add_card(win.config.account.as_ref().unwrap(), card); //todo
 		},
-		MsgAdd::TextInputQuestion(value) => win.add_vocabulary.text_input_question_value = value,
-		MsgAdd::TextInputAnswer(value) => win.add_vocabulary.text_input_answer_value = value,
+		MsgAdd::TextInputQuestion(value) => win.add.text_input_question_value = value,
+		MsgAdd::TextInputAnswer(value) => win.add.text_input_answer_value = value,
 	}
 }
 
@@ -78,42 +73,37 @@ pub fn view(win: &mut super::Window) -> Element<super::Message> {
 				.padding(5)
 				.align_items(Align::Center)
 				.push(Space::new(Length::Fill, Length::Shrink))
-				.push(
-					Button::new(&mut win.add_vocabulary.button_back, Text::new("back")).on_press(Message::Add(MsgAdd::Back)),
-				)
+				.push(Button::new(&mut win.add.button_back, Text::new("back")).on_press(Message::Add(MsgAdd::Back)))
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.push(Text::new("subject/language"))
 				.push(Space::new(Length::Fill, Length::Shrink))
 				.push(Text::new("tags: "))
 				.push(TextInput::new(
-					&mut win.add_vocabulary.text_input_tags,
+					&mut win.add.text_input_tags,
 					" none",
-					&win.add_vocabulary.text_input_tags_value,
+					&win.add.text_input_tags_value,
 					|value| Message::Add(MsgAdd::TextInputTags(value)),
 				))
 				.push(Space::new(Length::Fill, Length::Shrink))
-				.push(Checkbox::new(win.add_vocabulary.checkbox_both_sides, "bot sides", |_| {
+				.push(Checkbox::new(win.add.checkbox_both_sides, "bot sides", |_| {
 					Message::Add(MsgAdd::CheckboxBothSidesToogle)
 				}))
 				.push(Space::new(Length::Fill, Length::Shrink))
-				.push(
-					Button::new(&mut win.add_vocabulary.button_add, Text::new("add vocabulary"))
-						.on_press(Message::Add(MsgAdd::Add)),
-				)
+				.push(Button::new(&mut win.add.button_add, Text::new("add vocabulary")).on_press(Message::Add(MsgAdd::Add)))
 				.push(Space::new(Length::Fill, Length::Shrink)),
 		)
 		.push(
 			Row::new()
 				.push(TextInput::new(
-					&mut win.add_vocabulary.text_input_question,
+					&mut win.add.text_input_question,
 					"question",
-					&win.add_vocabulary.text_input_question_value,
+					&win.add.text_input_question_value,
 					|value| Message::Add(MsgAdd::TextInputQuestion(value)),
 				))
 				.push(TextInput::new(
-					&mut win.add_vocabulary.text_input_answer,
+					&mut win.add.text_input_answer,
 					"answer",
-					&win.add_vocabulary.text_input_answer_value,
+					&win.add.text_input_answer_value,
 					|value| Message::Add(MsgAdd::TextInputAnswer(value)),
 				)),
 		)
