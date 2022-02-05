@@ -52,8 +52,14 @@ pub fn get_status(account: &Account) -> attohttpc::Result<Status> {
 		.json()
 }
 
-pub fn add_card(account: &Account, card: card::New) -> attohttpc::Result<Status> {
-	unimplemented!();
+pub fn add_card(account: &Account, card: card::New) -> attohttpc::Result<()> {
+	attohttpc::post(format!("{}/add", account.server))
+		.bearer_auth(&account.token)
+		.json(&card)
+		.unwrap()
+		.send()?
+		.error_for_status()?;
+	Ok(())
 }
 
 pub trait LoginForAuthError<T> {

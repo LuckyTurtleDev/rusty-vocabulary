@@ -2,7 +2,7 @@ use iced::{button, text_input, widget::Space, Align, Button, Checkbox, Column, E
 
 use std::string::String;
 
-use crate::api::add_card;
+use crate::api::{add_card, LoginForAuthError};
 use rusty_vocabulary_models::card;
 
 use super::{Activity, Message};
@@ -59,7 +59,12 @@ pub fn update(win: &mut super::Window, message: MsgAdd) {
 					tags: win.add.text_input_tags_value.split(' ').map(|s| s.to_string()).collect(),
 				},
 			};
-			add_card(win.config.account.as_ref().unwrap(), card); //todo
+			let answer = add_card(win.config.account.as_ref().unwrap(), card)
+				.login_for_auth_error_else_panic(&mut win.activity, None);
+			if answer.is_some() {
+				win.add.text_input_answer_value = "".into();
+				win.add.text_input_question_value = "".into();
+			}
 		},
 		MsgAdd::TextInputQuestion(value) => win.add.text_input_question_value = value,
 		MsgAdd::TextInputAnswer(value) => win.add.text_input_answer_value = value,
