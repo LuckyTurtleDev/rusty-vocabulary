@@ -89,7 +89,14 @@ pub fn view(win: &mut super::Window) -> Element<super::Message> {
 					Message::Add(MsgAdd::CheckboxBothSidesToogle)
 				}))
 				.push(Space::new(Length::Fill, Length::Shrink))
-				.push(Button::new(&mut win.add.button_add, Text::new("add vocabulary")).on_press(Message::Add(MsgAdd::Add)))
+				.push({
+					let button = Button::new(&mut win.add.button_add, Text::new("add vocabulary"));
+					if win.add.text_input_question_value != "" && win.add.text_input_answer_value != "" {
+						button.on_press(Message::Add(MsgAdd::Add))
+					} else {
+						button
+					}
+				})
 				.push(Space::new(Length::Fill, Length::Shrink)),
 		)
 		.push(
