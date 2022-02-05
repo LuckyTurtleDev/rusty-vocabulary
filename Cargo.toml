@@ -1,5 +1,2 @@
 [workspace]
 members = ["client", "server"]
-
-[patch.crates-io]
-gotham_restful = { git = "https://github.com/msrd0/gotham_restful", branch = "jwt-v8" }
