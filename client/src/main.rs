@@ -2,6 +2,7 @@ use directories::ProjectDirs;
 use iced::{Element, Sandbox, Settings, Text};
 use once_cell::sync::Lazy;
 use std::{path::PathBuf, string::String};
+use typetest_themes::{ApplicationTheme, Theme};
 
 mod gui_errors;
 use gui_errors::*;
@@ -21,6 +22,7 @@ static PROJECT_DIRS: Lazy<ProjectDirs> =
 static CONFIG_FILE: Lazy<PathBuf> = Lazy::new(|| PROJECT_DIRS.config_dir().join("config.toml"));
 
 pub struct Window {
+	theme: Box<dyn ApplicationTheme>,
 	config: Config,
 	activity: Activity,
 	login: WinLogin,
@@ -44,6 +46,7 @@ impl Sandbox for Window {
 			};
 		}
 		Window {
+			theme: Theme::DefaultDark.into(),
 			config,
 			activity,
 			login: activitys::login::new(),

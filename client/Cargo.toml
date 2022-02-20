@@ -16,3 +16,4 @@ once_cell = "1.9"
 rusty-vocabulary-models = { path = "../models" }
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.5.8"
+typetest_themes = "1.0.0"

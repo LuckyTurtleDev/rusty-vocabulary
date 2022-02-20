@@ -1,4 +1,4 @@
-use iced::{button, widget::Space, Button, Column, Element, Length, Row, Text};
+use iced::{button, widget::Space, Button, Column, Container, Element, Length, Row, Text};
 use std::process::exit;
 
 use rusty_vocabulary_models::Status;
@@ -48,7 +48,7 @@ pub fn post_update(win: &mut super::Window) {
 }
 
 pub fn view(win: &mut super::Window) -> Element<super::Message> {
-	Row::new()
+	let content = Row::new()
 		.push(Space::new(Length::Fill, Length::Shrink))
 		.push(
 			Column::new()
@@ -64,22 +64,29 @@ pub fn view(win: &mut super::Window) -> Element<super::Message> {
 				.push(Space::new(Length::Shrink, Length::Fill))
 				.push(
 					Button::new(&mut win.main_menu.button_query, Text::new("query vocabulary"))
-						.on_press(Message::MainMenu(MsgMainMenu::Query)),
+						.on_press(Message::MainMenu(MsgMainMenu::Query))
+						.style(&win.theme),
 				)
 				.push(
 					Button::new(&mut win.main_menu.button_add, Text::new("add vocabulary"))
-						.on_press(Message::MainMenu(MsgMainMenu::Add)),
+						.on_press(Message::MainMenu(MsgMainMenu::Add))
+						.style(&win.theme),
 				)
-				.push(Button::new(
-					&mut win.main_menu.button_explore,
-					Text::new("explore vocabulary"),
-				))
+				.push(Button::new(&mut win.main_menu.button_explore, Text::new("explore vocabulary")).style(&win.theme))
 				.push(
 					Button::new(&mut win.main_menu.button_quit, Text::new("quit"))
-						.on_press(Message::MainMenu(MsgMainMenu::Quit)),
+						.on_press(Message::MainMenu(MsgMainMenu::Quit))
+						.style(&win.theme),
 				)
 				.push(Space::new(Length::Shrink, Length::Fill)),
 		)
-		.push(Space::new(Length::Fill, Length::Shrink))
+		.push(Space::new(Length::Fill, Length::Shrink));
+
+	Container::new(content)
+		.width(Length::Fill)
+		.height(Length::Fill)
+		.center_x()
+		.center_y()
+		.style(&win.theme)
 		.into()
 }
