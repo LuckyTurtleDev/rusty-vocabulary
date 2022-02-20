@@ -14,7 +14,7 @@ mod api;
 use api::*;
 
 mod activitys;
-use activitys::{add::*, login::*, main_menu::*, Activity, Message};
+use activitys::{add::*, login::*, main_menu::*, settings::*, Activity, Message};
 
 const CARGO_PKG_NAME: &'static str = env!("CARGO_PKG_NAME");
 static PROJECT_DIRS: Lazy<ProjectDirs> =
@@ -28,6 +28,7 @@ pub struct Window {
 	login: WinLogin,
 	main_menu: WinMainMenu,
 	add: WinAdd,
+	settings: WinSettings,
 }
 
 impl Sandbox for Window {
@@ -52,6 +53,7 @@ impl Sandbox for Window {
 			login: activitys::login::new(),
 			main_menu: activitys::main_menu::new(status),
 			add: activitys::add::new(),
+			settings: activitys::settings::new(),
 		}
 	}
 
@@ -64,6 +66,7 @@ impl Sandbox for Window {
 			Message::Login(msg) => activitys::login::update(self, msg),
 			Message::MainMenu(msg) => activitys::main_menu::update(self, msg),
 			Message::Add(msg) => activitys::add::update(self, msg),
+			Message::Settings(msg) => activitys::settings::update(self, msg),
 		};
 		if self.activity == Activity::MainMenu {
 			activitys::main_menu::post_update(self);
@@ -75,6 +78,7 @@ impl Sandbox for Window {
 			Activity::Login => activitys::login::view(self),
 			Activity::MainMenu => activitys::main_menu::view(self),
 			Activity::Query => Text::new("TODO").into(),
+			Activity::Settings => activitys::settings::view(self),
 			Activity::Add => activitys::add::view(self),
 		}
 	}

@@ -11,6 +11,7 @@ use super::{Activity, Message};
 pub enum MsgMainMenu {
 	Query,
 	Add,
+	Settings,
 	Quit,
 }
 
@@ -19,6 +20,7 @@ pub struct WinMainMenu {
 	pub button_query: button::State,
 	pub button_add: button::State,
 	pub button_explore: button::State,
+	pub button_settings: button::State,
 	pub button_quit: button::State,
 }
 
@@ -28,6 +30,7 @@ pub fn new(status: Status) -> WinMainMenu {
 		button_query: button::State::new(),
 		button_add: button::State::new(),
 		button_explore: button::State::new(),
+		button_settings: button::State::new(),
 		button_quit: button::State::new(),
 	}
 }
@@ -36,6 +39,7 @@ pub fn update(win: &mut super::Window, message: MsgMainMenu) {
 	match message {
 		MsgMainMenu::Quit => exit(0),
 		MsgMainMenu::Add => win.activity = Activity::Add,
+		MsgMainMenu::Settings => win.activity = Activity::Settings,
 		MsgMainMenu::Query => win.activity = Activity::Query,
 	}
 }
@@ -73,6 +77,11 @@ pub fn view(win: &mut super::Window) -> Element<super::Message> {
 						.style(&win.theme),
 				)
 				.push(Button::new(&mut win.main_menu.button_explore, Text::new("explore vocabulary")).style(&win.theme))
+				.push(
+					Button::new(&mut win.main_menu.button_settings, Text::new("settings"))
+						.on_press(Message::MainMenu(MsgMainMenu::Settings))
+						.style(&win.theme),
+				)
 				.push(
 					Button::new(&mut win.main_menu.button_quit, Text::new("quit"))
 						.on_press(Message::MainMenu(MsgMainMenu::Quit))
