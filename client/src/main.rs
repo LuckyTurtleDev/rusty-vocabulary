@@ -1,8 +1,9 @@
+use config::ThemeTitel;
 use directories::ProjectDirs;
 use iced::{Element, Sandbox, Settings, Text};
 use once_cell::sync::Lazy;
 use std::{path::PathBuf, string::String};
-use typetest_themes::{ApplicationTheme, Theme};
+use typetest_themes::ApplicationTheme;
 
 mod gui_errors;
 use gui_errors::*;
@@ -47,7 +48,10 @@ impl Sandbox for Window {
 			};
 		}
 		Window {
-			theme: Theme::DefaultDark.into(),
+			theme: match config.theme.unwrap_or_default() {
+				ThemeTitel::Dark => typetest_themes::Theme::DefaultDark.into(),
+				ThemeTitel::Light => typetest_themes::Theme::DefaultLight.into(),
+			},
 			config,
 			activity,
 			login: activitys::login::new(),

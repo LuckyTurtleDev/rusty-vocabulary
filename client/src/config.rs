@@ -1,6 +1,7 @@
 use crate::{api::Account, gui_errors::*, CONFIG_FILE};
 use serde::{Deserialize, Serialize};
 use std::fs;
+use strum_macros::Display;
 
 pub fn load_config() -> Config {
 	let file_content = fs::read_to_string(CONFIG_FILE.as_path());
@@ -38,7 +39,21 @@ pub fn save_config(config: &Config) {
 	}
 }
 
+#[derive(Clone, Copy, Debug, Deserialize, Display, PartialEq, Eq, Serialize)]
+#[strum(serialize_all = "lowercase")]
+pub enum ThemeTitel {
+	Light,
+	Dark,
+}
+
+impl Default for ThemeTitel {
+	fn default() -> ThemeTitel {
+		ThemeTitel::Dark
+	}
+}
+
 #[derive(Default, Deserialize, Serialize)]
 pub struct Config {
 	pub account: Option<Account>,
+	pub theme: Option<ThemeTitel>,
 }
