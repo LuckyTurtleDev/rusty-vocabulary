@@ -1,3 +1,4 @@
+use super::Message;
 use iced::{pick_list, Column, Container, Element, Length, PickList, Text};
 use strum_macros::Display;
 
@@ -32,12 +33,15 @@ pub fn new() -> WinSettings {
 pub fn update(win: &mut super::Window, message: MsgSettings) {}
 
 pub fn view(win: &mut super::Window) -> Element<super::Message> {
-	let content = Column::new().push(Text::new("Theme:")).push(PickList::new(
-		&mut win.settings.pick_list_theme,
-		vec![ThemeTitel::Light, ThemeTitel::Dark],
-		Some(win.settings.pick_list_theme_value),
-		MsgSettings::ThemeSelected,
-	));
+	let content = Column::new().push(Text::new("Theme:")).push(
+		PickList::new(
+			&mut win.settings.pick_list_theme,
+			vec![ThemeTitel::Light, ThemeTitel::Dark],
+			Some(win.settings.pick_list_theme_value),
+			|value| Message::Settings(MsgSettings::ThemeSelected(value)),
+		)
+		.style(&win.theme),
+	);
 
 	Container::new(content)
 		.width(Length::Fill)
@@ -45,5 +49,5 @@ pub fn view(win: &mut super::Window) -> Element<super::Message> {
 		.center_x()
 		.center_y()
 		.style(&win.theme)
-		.into() //https://github.com/iced-rs/iced/blob/06517aa7e83b92f22795046bfd1f78402285d62f/examples/pick_list/src/main.rs#L42
+		.into()
 }
